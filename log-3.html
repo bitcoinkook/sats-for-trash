@@ -1,0 +1,1042 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Log — Sats for Trash</title>
+<meta name="description" content="Full outings log, stats, sacred spots and zapper ranking for Sats for Trash.">
+<meta property="og:title" content="Log — Sats for Trash">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://satsfortrash.com/log.html">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+.kook-trash {
+  --font-serif: 'Crimson Pro', Georgia, 'Times New Roman', serif;
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, Monaco, Consolas, 'Liberation Mono', monospace;
+  --brand-orange: #f7931a;
+  --text-h1: 2.2em;
+  --text-h2: 1.4em;
+  --text-lead: 1.1em;
+  --text-body: 1em;
+  --text-meta: 0.85em;
+  --text-label: 0.75em;
+  --letter-label: 0.06em;
+  font-family: var(--font-serif);
+  color: #222;
+  max-width: 820px;
+  line-height: 1.7;
+  margin: 0 auto;
+  padding: 0 16px;
+}
+.kook-trash .kook-lang {
+  display: flex;
+  justify-content: flex-end;
+  gap: 6px;
+  margin-bottom: 16px;
+}
+.kook-trash .kook-lang button {
+  font-family: var(--font-sans);
+  font-size: var(--text-label);
+  letter-spacing: var(--letter-label);
+  text-transform: uppercase;
+  padding: 3px 8px;
+  border: 1px solid #ddd;
+  background: #fff;
+  color: #888;
+  cursor: pointer;
+  border-radius: 3px;
+  font-weight: 500;
+}
+.kook-trash .kook-lang button.active {
+  background: var(--brand-orange);
+  color: #fff;
+  border-color: var(--brand-orange);
+}
+.kook-trash h1 {
+  font-size: var(--text-h1);
+  font-weight: 700;
+  margin: 0 0 0.3em 0;
+  color: #111;
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+}
+.kook-trash h2 {
+  font-size: var(--text-h2);
+  font-weight: 600;
+  margin: 2.4em 0 0.7em 0;
+  color: #111;
+  border-bottom: 1px solid #f0f0f0;
+  padding-bottom: 6px;
+  line-height: 1.25;
+}
+.kook-trash p { margin: 0 0 1.1em 0; }
+.kook-trash strong { color: #111; }
+/* Navigation */
+.kook-trash .kook-nav {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  margin-bottom: 24px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #f0f0f0;
+  font-family: var(--font-sans);
+  font-size: var(--text-label);
+  font-weight: 600;
+  letter-spacing: var(--letter-label);
+  text-transform: uppercase;
+}
+.kook-trash .kook-nav a { color: #888; text-decoration: none; }
+.kook-trash .kook-nav a:hover { color: var(--brand-orange); }
+.kook-trash .kook-nav a.active { color: var(--brand-orange); }
+/* Intro copy */
+.kook-trash .kook-log-intro {
+  font-family: var(--font-serif);
+  font-size: var(--text-lead);
+  color: #555;
+  line-height: 1.6;
+  margin: 0 0 24px 0;
+}
+/* Headline stats — the four numbers that matter */
+.kook-trash .kook-headline-stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  margin: 24px 0 12px 0;
+}
+.kook-trash .kook-headline-card {
+  background: #1a1a1a;
+  color: #fff;
+  border-radius: 10px;
+  padding: 18px 10px;
+  text-align: center;
+}
+.kook-trash .kook-headline-val {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 1.7em;
+  font-weight: 700;
+  color: var(--brand-orange);
+  line-height: 1.05;
+  white-space: nowrap;
+}
+.kook-trash .kook-headline-label {
+  display: block;
+  font-family: var(--font-sans);
+  font-size: var(--text-label);
+  letter-spacing: var(--letter-label);
+  text-transform: uppercase;
+  color: #b0b0b0;
+  margin-top: 8px;
+  font-weight: 500;
+}
+/* Derived stats — recessive single line */
+.kook-trash .kook-derived-stats {
+  font-family: var(--font-sans);
+  font-size: var(--text-meta);
+  color: #888;
+  text-align: center;
+  margin: 0 0 8px 0;
+  line-height: 1.8;
+}
+.kook-trash .kook-derived-stats strong {
+  font-family: var(--font-mono);
+  color: #555;
+  font-weight: 600;
+}
+/* Outings feed */
+.kook-trash .kook-feed {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 14px 0;
+}
+.kook-trash .kook-feed-row {
+  display: flex;
+  gap: 12px;
+  align-items: stretch;
+  background: #fff;
+  border: 1px solid #eee;
+  border-radius: 8px;
+  padding: 10px;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+.kook-trash .kook-feed-row:hover {
+  border-color: var(--brand-orange);
+  box-shadow: 0 1px 6px rgba(247,147,26,0.12);
+}
+.kook-trash .kook-feed-thumb {
+  flex-shrink: 0;
+  width: 96px;
+  height: 96px;
+  border-radius: 5px;
+  overflow: hidden;
+  background: #f0f0f0;
+  display: block;
+}
+.kook-trash .kook-feed-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.kook-trash .kook-feed-thumb-empty {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.4em;
+  opacity: 0.25;
+}
+.kook-trash .kook-feed-body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 3px;
+}
+.kook-trash .kook-feed-top {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.kook-trash .kook-feed-date {
+  font-family: var(--font-mono);
+  font-size: var(--text-meta);
+  font-weight: 700;
+  color: var(--brand-orange);
+  white-space: nowrap;
+}
+.kook-trash .kook-feed-spot {
+  font-family: var(--font-serif);
+  font-size: var(--text-body);
+  font-weight: 600;
+  color: #111;
+  min-width: 0;
+  word-break: break-word;
+}
+.kook-trash .kook-feed-num {
+  font-family: var(--font-mono);
+  font-size: var(--text-label);
+  color: #999;
+  white-space: nowrap;
+}
+.kook-trash .kook-feed-meta {
+  font-family: var(--font-sans);
+  font-size: var(--text-meta);
+  color: #777;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 12px;
+  align-items: center;
+}
+.kook-trash .kook-feed-meta strong {
+  font-family: var(--font-mono);
+  color: #444;
+  font-weight: 600;
+}
+.kook-trash .kook-feed-sats {
+  font-family: var(--font-mono);
+  font-size: var(--text-meta);
+  font-weight: 700;
+  color: var(--brand-orange);
+  white-space: nowrap;
+}
+.kook-trash .kook-feed-zapline {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-top: 1px;
+}
+.kook-trash .kook-feed-avatars {
+  display: flex;
+  align-items: center;
+}
+.kook-trash .kook-feed-avatars > * {
+  margin-right: -6px;
+  border: 1.5px solid #fff;
+  border-radius: 50%;
+}
+.kook-trash .kook-feed-avatars > *:last-child { margin-right: 0; }
+.kook-trash .kook-feed-nozap {
+  font-family: var(--font-sans);
+  font-size: var(--text-meta);
+  color: #bbb;
+  font-style: italic;
+}
+.kook-trash .kook-feed-zapcta {
+  font-family: var(--font-sans);
+  font-size: var(--text-label);
+  font-weight: 600;
+  color: var(--brand-orange);
+  text-decoration: none;
+  border-bottom: 1px dotted var(--brand-orange);
+  white-space: nowrap;
+}
+.kook-trash .kook-feed-zapcta:hover { border-bottom-style: solid; }
+.kook-trash .kook-feed-link {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  padding-left: 4px;
+  font-family: var(--font-sans);
+  font-size: 1.1em;
+  color: #ccc;
+  text-decoration: none;
+}
+.kook-trash .kook-feed-link:hover { color: var(--brand-orange); }
+/* Feed summary line */
+.kook-trash .kook-feed-summary {
+  font-family: var(--font-sans);
+  font-size: var(--text-meta);
+  color: #888;
+  margin: 10px 0 0 0;
+  padding: 8px 12px;
+  background: #fafafa;
+  border-radius: 5px;
+  text-align: center;
+}
+.kook-trash .kook-feed-summary strong {
+  font-family: var(--font-mono);
+  color: #444;
+  font-weight: 700;
+}
+/* Best outing cards */
+.kook-trash .kook-log-best {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin: 16px 0;
+}
+.kook-trash .kook-log-best-card {
+  background: #1a1a1a;
+  color: #fff;
+  border-radius: 8px;
+  padding: 14px 16px;
+}
+.kook-trash .kook-log-best-label {
+  font-family: var(--font-sans);
+  font-size: var(--text-label);
+  letter-spacing: var(--letter-label);
+  text-transform: uppercase;
+  color: #aaa;
+  font-weight: 500;
+  margin-bottom: 6px;
+  display: block;
+}
+.kook-trash .kook-log-best-val {
+  font-family: var(--font-mono);
+  font-size: 1.4em;
+  font-weight: 700;
+  color: var(--brand-orange);
+  line-height: 1.1;
+}
+.kook-trash .kook-log-best-meta {
+  font-family: var(--font-sans);
+  font-size: var(--text-meta);
+  color: #aaa;
+  margin-top: 4px;
+}
+.kook-trash .kook-log-best-meta a {
+  color: #aaa;
+  text-decoration: none;
+  border-bottom: 1px dotted #555;
+}
+.kook-trash .kook-log-best-meta a:hover { border-bottom-color: var(--brand-orange); color: var(--brand-orange); }
+/* Spot filter chips */
+.kook-trash .kook-spot-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 16px 0 12px 0;
+}
+.kook-trash .kook-spot-chip {
+  font-family: var(--font-sans);
+  font-size: var(--text-meta);
+  padding: 4px 12px;
+  border: 1px solid #ddd;
+  border-radius: 20px;
+  background: #fff;
+  color: #555;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.15s ease;
+}
+.kook-trash .kook-spot-chip:hover { border-color: var(--brand-orange); color: var(--brand-orange); }
+.kook-trash .kook-spot-chip.active {
+  background: var(--brand-orange);
+  border-color: var(--brand-orange);
+  color: #fff;
+}
+.kook-trash .kook-filter-active {
+  font-family: var(--font-sans);
+  font-size: var(--text-meta);
+  color: #555;
+  margin: 0 0 8px 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.kook-trash .kook-filter-clear {
+  background: none;
+  border: 1px solid #ddd;
+  border-radius: 3px;
+  padding: 2px 8px;
+  font-family: var(--font-sans);
+  font-size: var(--text-label);
+  color: #888;
+  cursor: pointer;
+}
+.kook-trash .kook-filter-clear:hover { border-color: var(--brand-orange); color: var(--brand-orange); }
+/* Pagination */
+.kook-trash .kook-pagination {
+  display: flex; justify-content: center; align-items: center;
+  gap: 8px; margin: 12px 0 4px 0;
+  font-family: var(--font-sans); font-size: var(--text-meta);
+}
+.kook-trash .kook-pagination button {
+  background: #111; color: var(--brand-orange); border: none;
+  border-radius: 3px; padding: 5px 12px; cursor: pointer;
+  font-family: var(--font-sans); font-size: var(--text-meta);
+}
+.kook-trash .kook-pagination button:disabled { background: #e0e0e0; color: #aaa; cursor: default; }
+.kook-trash .kook-pagination .kook-page-info { color: #666; }
+/* Ranking */
+.kook-trash .kook-section-label {
+  font-family: var(--font-sans); font-size: var(--text-label); letter-spacing: var(--letter-label);
+  text-transform: uppercase; color: var(--brand-orange); font-weight: 600; margin-bottom: 8px; display: block;
+}
+.kook-trash .kook-section-desc { color: #888; font-family: var(--font-sans); font-size: var(--text-meta); margin: 4px 0 12px 0; }
+/* Sacred spots */
+.kook-trash .kook-spots { display: grid; grid-template-columns: 1fr; gap: 12px; margin: 16px 0; }
+.kook-trash .kook-spot {
+  background: #f9f9f9; border: 1px solid #e8e8e8; border-radius: 6px;
+  padding: 12px 14px; display: flex; gap: 14px; align-items: flex-start;
+}
+.kook-trash .kook-spot-photo { flex-shrink: 0; width: 96px; height: 96px; border-radius: 4px; overflow: hidden; background: #eee; }
+.kook-trash .kook-spot-photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.kook-trash .kook-spot-body { flex: 1; min-width: 0; }
+.kook-trash .kook-spot-name { font-family: var(--font-serif); font-size: var(--text-lead); font-weight: 600; color: #111; margin-bottom: 6px; }
+.kook-trash .kook-spot-name-link { color: #111; text-decoration: none; border-bottom: 1px dotted #ccc; }
+.kook-trash .kook-spot-name-link:hover { border-bottom-color: var(--brand-orange); color: var(--brand-orange); }
+.kook-trash .kook-spot-stats { display: flex; flex-wrap: wrap; gap: 4px 14px; font-family: var(--font-sans); font-size: var(--text-meta); color: #666; line-height: 1.5; }
+.kook-trash .kook-spot-stat strong { font-family: var(--font-mono); color: var(--brand-orange); font-weight: 700; }
+.kook-trash .kook-spot-stat-muted { color: #aaa; font-style: italic; }
+.kook-trash .kook-spot-stat a { color: #666; text-decoration: none; border-bottom: 1px dotted #ccc; }
+.kook-trash .kook-spot-stat a:hover { border-bottom-color: var(--brand-orange); color: var(--brand-orange); }
+.kook-trash .kook-spot-note { font-family: var(--font-serif); font-size: var(--text-meta); font-style: italic; color: #777; margin: 6px 0 0 0; }
+/* Loading / error */
+.kook-trash .kook-loading { text-align: center; padding: 40px 20px; color: #888; font-style: italic; font-family: var(--font-sans); }
+.kook-trash .kook-error { background: #fff0f0; border-left: 4px solid #c00; padding: 14px 20px; margin: 20px 0; color: #800; border-radius: 0 4px 4px 0; font-family: var(--font-sans); }
+.kook-trash .kook-error-message { margin: 0 0 12px 0; }
+.kook-trash .kook-error-detail { font-family: var(--font-mono); font-size: var(--text-meta); color: #a44; margin: 0 0 12px 0; }
+.kook-trash .kook-retry-btn { background: #c00; color: #fff; border: none; border-radius: 4px; padding: 8px 16px; font-family: var(--font-sans); font-size: var(--text-meta); font-weight: 600; cursor: pointer; }
+.kook-trash .kook-retry-btn:hover { background: #a00; }
+.kook-trash .kook-warning { background: #fffbe6; border-left: 4px solid #c90; padding: 10px 16px; margin: 12px 0; color: #850; border-radius: 0 4px 4px 0; font-size: 14px; font-family: var(--font-sans); }
+/* Footer */
+.kook-trash .kook-footer {
+  margin-top: 40px; padding: 20px 16px 28px 16px;
+  border-top: 1px solid #eee; text-align: center;
+  font-family: var(--font-sans); font-size: var(--text-meta); color: #888; line-height: 1.6;
+}
+.kook-trash .kook-footer p { margin: 0; }
+.kook-trash .kook-footer a { color: #888; text-decoration: none; border-bottom: 1px dotted #ccc; }
+.kook-trash .kook-footer a:hover { color: var(--brand-orange); border-bottom-color: var(--brand-orange); }
+/* Lang visibility */
+.kook-trash [data-lang-en] { display: none; }
+.kook-trash.lang-en [data-lang-es] { display: none; }
+.kook-trash.lang-en [data-lang-en] { display: block; }
+.kook-trash .kook-section-label[data-lang-en] { display: none; }
+.kook-trash.lang-en .kook-section-label[data-lang-es] { display: none; }
+.kook-trash.lang-en .kook-section-label[data-lang-en] { display: block; }
+@media (max-width: 600px) {
+  .kook-trash { --text-h1: 1.8em; --text-h2: 1.2em; --text-lead: 1em; --text-body: 0.95em; --text-meta: 0.8em; --text-label: 0.7em; }
+  .kook-trash .kook-headline-stats { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+  .kook-trash .kook-headline-card { padding: 14px 8px; }
+  .kook-trash .kook-headline-val { font-size: 1.4em; }
+  .kook-trash .kook-log-best { grid-template-columns: 1fr; }
+  .kook-trash .kook-spot { padding: 10px 12px; gap: 10px; }
+  .kook-trash .kook-spot-photo { width: 78px; height: 78px; }
+  .kook-trash .kook-feed-thumb { width: 78px; height: 78px; }
+  .kook-trash .kook-feed-row { padding: 8px; gap: 10px; }
+}
+/* Header row — nav left, language right */
+.kook-trash .kook-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 28px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #f0f0f0;
+}
+.kook-trash .kook-header .kook-nav {
+  margin-bottom: 0;
+  padding-bottom: 0;
+  border-bottom: none;
+}
+.kook-trash .kook-header .kook-lang { margin-bottom: 0; }
+.kook-trash .kook-title-accent { color: var(--brand-orange); }
+</style>
+</head>
+<body>
+<div class="kook-trash lang-en" id="kookTrash">
+
+  <div class="kook-header">
+    <nav class="kook-nav">
+    <a href="index.html">Home</a>
+    <a href="log.html" class="active">Log</a>
+    <a href="about.html">About</a>
+    </nav>
+    <div class="kook-lang">
+    <button class="active" id="btnEn" onclick="setLang('en')">EN</button>
+    <button id="btnEs" onclick="setLang('es')">ES</button>
+    </div>
+  </div>
+  <h1 data-lang-es="">Registro</h1>
+  <h1 data-lang-en="">Log</h1>
+
+  <div class="kook-loading" id="loadingBox">
+    <span data-lang-es="">Cargando datos...</span>
+    <span data-lang-en="">Loading data...</span>
+  </div>
+  <div class="kook-error" id="errorBox" style="display:none;"></div>
+  <div class="kook-warning" id="warningBox" style="display:none;"></div>
+
+  <div id="content" style="display:none;">
+
+    <!-- INTRO — orientation + SEO surface -->
+    <p data-lang-es="" class="kook-log-intro">Cada salida a limpiar playas y espacios naturales queda registrada aquí: la fecha, el lugar, las bolsas recogidas, el tiempo invertido y los sats recibidos vía zaps en Nostr.</p>
+    <p data-lang-en="" class="kook-log-intro">Every beach and nature cleanup outing is recorded here: the date, the place, bags collected, time spent, and sats received via Nostr zaps.</p>
+
+    <!-- HEADLINE STATS -->
+    <div class="kook-headline-stats" id="headlineStats"></div>
+    <p class="kook-derived-stats" id="derivedStats"></p>
+
+    <!-- RECORDS -->
+    <h2 data-lang-es="">🏅 Récords</h2>
+    <h2 data-lang-en="">🏅 Records</h2>
+    <div class="kook-log-best" id="bestGrid"></div>
+
+    <!-- OUTINGS FEED -->
+    <h2 data-lang-es="">📋 Salidas</h2>
+    <h2 data-lang-en="">📋 Outings</h2>
+    <p data-lang-es="">Cada entrada es una nota publicada en Nostr. Filtra por spot o pulsa una salida para ver la nota original.</p>
+    <p data-lang-en="">Each entry is a note published on Nostr. Filter by spot, or tap an outing to see the original note.</p>
+    <div class="kook-spot-filters" id="spotChips"></div>
+    <div id="filterStatus" style="display:none;" class="kook-filter-active">
+      <span id="filterLabel"></span>
+      <button class="kook-filter-clear" onclick="clearSpotFilter()" data-lang-es="">× Limpiar filtro</button>
+      <button class="kook-filter-clear" onclick="clearSpotFilter()" data-lang-en="">× Clear filter</button>
+    </div>
+    <div id="outingsLogAnchor"></div>
+    <div class="kook-feed" id="outingsFeed"></div>
+    <div class="kook-feed-summary" id="feedSummary"></div>
+    <div class="kook-pagination" id="paginationNotas"></div>
+
+    <!-- SACRED SPOTS -->
+    <h2 data-lang-es="">🌀 Spots Sagrados</h2>
+    <h2 data-lang-en="">🌀 Sacred Spots</h2>
+    <p data-lang-es="">Los lugares que se están limpiando. El nombre del spot enlaza al mapa cuando hay coordenadas.</p>
+    <p data-lang-en="">The places being cleaned up. Spot names link to the map when coordinates are available.</p>
+    <div class="kook-spots" id="spotsList"></div>
+
+
+  </div>
+
+  <footer class="kook-footer">
+    <p data-lang-es="">Hecho por <a href="https://primal.net/p/npub15r3rm0jjkqyaqf8e5yrxuu5y0z2xmrypnt6nqtgerdqmahcz29js0xdaeh" target="_blank" rel="noopener">bitcoinkook</a> · Código abierto bajo <a href="https://github.com/bitcoinkook/sats-for-trash/blob/main/LICENSE" target="_blank" rel="noopener">licencia MIT</a> · <a href="https://github.com/bitcoinkook/sats-for-trash" target="_blank" rel="noopener">GitHub</a></p>
+    <p data-lang-en="">Made by <a href="https://primal.net/p/npub15r3rm0jjkqyaqf8e5yrxuu5y0z2xmrypnt6nqtgerdqmahcz29js0xdaeh" target="_blank" rel="noopener">bitcoinkook</a> · Open source under the <a href="https://github.com/bitcoinkook/sats-for-trash/blob/main/LICENSE" target="_blank" rel="noopener">MIT License</a> · <a href="https://github.com/bitcoinkook/sats-for-trash" target="_blank" rel="noopener">GitHub</a></p>
+  </footer>
+</div>
+
+<script>
+const SHEET_ID = "1DRyYO2rM-hkRgXzJebkKYk5bj_BZaemFYZOU_7VnNJE";
+const URL_NOTES   = "https://docs.google.com/spreadsheets/d/" + SHEET_ID + "/gviz/tq?tqx=out:csv&sheet=Notes";
+const URL_ZAPS    = "https://docs.google.com/spreadsheets/d/" + SHEET_ID + "/gviz/tq?tqx=out:csv&sheet=Zaps";
+const URL_ZAPPERS = "https://docs.google.com/spreadsheets/d/" + SHEET_ID + "/gviz/tq?tqx=out:csv&sheet=Zappers";
+const URL_SPOTS   = "https://docs.google.com/spreadsheets/d/" + SHEET_ID + "/gviz/tq?tqx=out:csv&sheet=Spots";
+const URL_OUTERS  = "https://docs.google.com/spreadsheets/d/" + SHEET_ID + "/gviz/tq?tqx=out:csv&sheet=outers";
+
+let NOTES = [], ZAPPERS = {}, SPOTS = {}, OUTERS = {};
+let currentLang = "en";
+let pageNotas = 0;
+let activeSpotFilter = null; // null = no filter, string = spot id
+const PAGE_SIZE = 10;
+const PAGE_SIZE_TABLE = 15;
+
+// ── Utility functions ──────────────────────────────────────────────────────
+function escHtml(s) {
+  return String(s == null ? "" : s)
+    .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;").replace(/'/g, "&#39;");
+}
+function fmtFecha(iso, lang) {
+  const [y,m,d] = iso.split("-").map(Number);
+  const dd = String(d).padStart(2,"0"), mm = String(m).padStart(2,"0");
+  return lang==="en" ? mm+"/"+dd : dd+"/"+mm;
+}
+function fmtNum(n, lang) {
+  const l = lang || currentLang || "en";
+  return n.toLocaleString(l==="en" ? "en-US" : "es-ES");
+}
+function fmtBolsasNum(n) { return String(Math.round(n)); }
+function fmtBolsas2(n, lang) {
+  const s = n.toFixed(2);
+  return lang==="en" ? s : s.replace(".",",");
+}
+function totalSats(nota) { return nota.zaps.reduce((s,z)=>s+z.sats,0); }
+function noteUrl(eventId) { return "https://primal.net/e/"+eventId; }
+function profileUrl(npub) { return "https://primal.net/p/"+npub; }
+function shortNpub(npub) {
+  if (!npub || npub.length < 20) return npub;
+  return npub.slice(0,12)+"…"+npub.slice(-8);
+}
+function zapperDisplay(npub) {
+  const z = ZAPPERS[npub];
+  return (z && z.displayName) ? z.displayName : shortNpub(npub);
+}
+function zapperLink(npub) {
+  return '<a href="'+profileUrl(npub)+'" target="_blank" rel="noopener">'+escHtml(zapperDisplay(npub))+'</a>';
+}
+function npubColor(npub) {
+  let hash = 0;
+  for (let i = 0; i < npub.length; i++) { hash = ((hash << 5) - hash) + npub.charCodeAt(i); hash = hash & hash; }
+  return "hsl("+(Math.abs(hash) % 360)+", 55%, 50%)";
+}
+function zapperInitial(npub) { return zapperDisplay(npub).charAt(0).toUpperCase(); }
+function zapperAvatar(npub, size) {
+  const z = ZAPPERS[npub];
+  const pic = z && z.picture;
+  const dim = 'width:'+size+'px;height:'+size+'px;border-radius:50%;display:inline-block;vertical-align:middle;flex-shrink:0;';
+  if (pic) return '<img src="'+escHtml(pic)+'" alt="" style="'+dim+'object-fit:cover">';
+  const fontSize = Math.round(size * 0.45);
+  return '<span style="'+dim+'background:'+npubColor(npub)+';color:#fff;text-align:center;line-height:'+size+'px;font-family:var(--font-sans);font-weight:600;font-size:'+fontSize+'px">'+escHtml(zapperInitial(npub))+'</span>';
+}
+function decodeGeohash(gh) {
+  if (!gh) return null;
+  const base32 = "0123456789bcdefghjkmnpqrstuvwxyz";
+  let latRange = [-90, 90], lonRange = [-180, 180], isLon = true;
+  const s = String(gh).toLowerCase().trim();
+  for (let i = 0; i < s.length; i++) {
+    const idx = base32.indexOf(s[i]);
+    if (idx === -1) return null;
+    for (let bit = 4; bit >= 0; bit--) {
+      const range = isLon ? lonRange : latRange;
+      const mid = (range[0] + range[1]) / 2;
+      if ((idx >> bit) & 1) range[0] = mid; else range[1] = mid;
+      isLon = !isLon;
+    }
+  }
+  return [(latRange[0]+latRange[1])/2, (lonRange[0]+lonRange[1])/2];
+}
+function spotMapUrl(geohash) {
+  const c = decodeGeohash(geohash);
+  if (!c) return null;
+  return "https://www.openstreetmap.org/?mlat="+c[0].toFixed(5)+"&mlon="+c[1].toFixed(5)+"&zoom=15";
+}
+
+// ── CSV / data loading ────────────────────────────────────────────────────
+function parseCSV(text) {
+  const rows = []; let row=[], cell="", inQuotes=false;
+  for (let i=0; i<text.length; i++) {
+    const c=text[i];
+    if (inQuotes) {
+      if (c==='"'&&text[i+1]==='"') { cell+='"'; i++; }
+      else if (c==='"') inQuotes=false; else cell+=c;
+    } else {
+      if (c==='"') inQuotes=true;
+      else if (c===',') { row.push(cell); cell=""; }
+      else if (c==='\n'||c==='\r') {
+        if (cell!==""||row.length>0) { row.push(cell); rows.push(row); row=[]; cell=""; }
+        if (c==='\r'&&text[i+1]==='\n') i++;
+      } else cell+=c;
+    }
+  }
+  if (cell!==""||row.length>0) { row.push(cell); rows.push(row); }
+  return rows;
+}
+function normalizaFecha(s) {
+  s=String(s).trim();
+  if (/^\d{4}-\d{2}-\d{2}$/.test(s)) return s;
+  const m=s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+  if (m) return m[3]+"-"+m[2].padStart(2,"0")+"-"+m[1].padStart(2,"0");
+  return s;
+}
+function getLang() {
+  const root = document.getElementById("kookTrash");
+  return root && root.classList.contains("lang-en") ? "en" : "es";
+}
+function showError(msg) {
+  const lang = getLang();
+  document.getElementById("loadingBox").style.display = "none";
+  const eb = document.getElementById("errorBox");
+  eb.style.display = "block"; eb.innerHTML = "";
+  const p = document.createElement("p"); p.className = "kook-error-message";
+  p.textContent = lang==="es" ? "No se pudieron cargar los datos." : "Could not load data.";
+  eb.appendChild(p);
+  if (msg) { const d=document.createElement("p"); d.className="kook-error-detail"; d.textContent=msg; eb.appendChild(d); }
+  const btn = document.createElement("button"); btn.className="kook-retry-btn";
+  btn.textContent = lang==="es" ? "Reintentar" : "Retry";
+  btn.onclick = function(){ eb.style.display="none"; document.getElementById("loadingBox").style.display="block"; loadData(); };
+  eb.appendChild(btn);
+}
+function showWarning(msg) {
+  const wb = document.getElementById("warningBox"); wb.style.display="block"; wb.textContent=msg;
+}
+async function fetchCsv(url, label) {
+  const res = await fetch(url);
+  if (!res.ok) throw new Error(label + ": HTTP " + res.status);
+  return parseCSV(await res.text());
+}
+
+async function loadData() {
+  const lang = getLang();
+  document.getElementById("warningBox").style.display = "none";
+  const [notesR, zapsR, zappersR, spotsR, outersR] = await Promise.allSettled([
+    fetchCsv(URL_NOTES,"Notes"), fetchCsv(URL_ZAPS,"Zaps"),
+    fetchCsv(URL_ZAPPERS,"Zappers"), fetchCsv(URL_SPOTS,"Spots"), fetchCsv(URL_OUTERS,"outers")
+  ]);
+  if (notesR.status==="rejected") { showError(notesR.reason&&notesR.reason.message); return; }
+  const rowsN = notesR.value;
+  if (rowsN.length < 2) { showError(lang==="es"?"La pestaña Notes está vacía":"Notes tab is empty"); return; }
+
+  ZAPPERS = {};
+  if (zappersR.status==="fulfilled") {
+    zappersR.value.slice(1).forEach(r => {
+      if (!r[0]) return;
+      ZAPPERS[String(r[0]).trim()] = { displayName:String(r[1]||"").trim(), nip05:String(r[2]||"").trim(), lnAddress:String(r[3]||"").trim(), picture:String(r[4]||"").trim() };
+    });
+  } else showWarning(lang==="es" ? "⚠ No se pudo cargar Zappers." : "⚠ Could not load Zappers tab.");
+
+  const zapsById = {};
+  if (zapsR.status==="fulfilled") {
+    zapsR.value.slice(1).forEach(r => {
+      if (!r[0]||!r[1]) return;
+      const id=String(r[0]).trim(), npub=String(r[1]).trim();
+      const sats=parseInt(String(r[2]).replace(/[^\d-]/g,""),10)||0;
+      const zapDate=normalizaFecha(String(r[3]||"").trim())||"";
+      const zappedOuter=String(r[4]||"").trim();
+      if (!zapsById[id]) zapsById[id]=[];
+      zapsById[id].push({npub,sats,zapDate,zappedOuter});
+    });
+  } else showWarning(lang==="es" ? "⚠ No se pudo cargar Zaps." : "⚠ Could not load Zaps tab.");
+
+  SPOTS = {};
+  if (spotsR.status==="fulfilled") {
+    spotsR.value.slice(1).forEach(r => {
+      if (!r[0]) return;
+      SPOTS[String(r[0]).trim()] = { name:String(r[1]||"").trim(), geohash:String(r[2]||"").trim().toLowerCase(), note:String(r[3]||"").trim(), imageUrl:String(r[4]||"").trim() };
+    });
+  }
+
+  OUTERS = {};
+  if (outersR.status==="fulfilled") {
+    outersR.value.slice(1).forEach(r => {
+      if (!r[0]) return;
+      OUTERS[String(r[0]).trim()] = { displayName:String(r[1]||"").trim(), npub:String(r[2]||"").trim(), nip05:String(r[3]||"").trim(), lnAddress:String(r[4]||"").trim(), imageUrl:String(r[5]||"").trim() };
+    });
+  }
+
+  NOTES = [];
+  for (let i=1; i<rowsN.length; i++) {
+    const r=rowsN[i];
+    if (!r[0]||!r[1]||!r[2]) continue;
+    const id=String(r[0]).trim(), date=normalizaFecha(r[1]), eventId=String(r[2]).trim();
+    const bags=parseFloat(String(r[3]).replace(",","."))||0;
+    const imageUrl=String(r[4]||"").trim(), spotId=String(r[5]||"").trim(), outerId=String(r[6]||"").trim();
+    const minutes=parseInt(String(r[7]||"").trim())||0;
+    const zaps=(zapsById[id]||[]).map(z=>({npub:z.npub,sats:z.sats,zapDate:z.zapDate,zappedOuter:z.zappedOuter}));
+    NOTES.push({id,date,eventId,bags,imageUrl,spotId,outerId,minutes,zaps});
+  }
+  if (NOTES.length===0) { showError(lang==="es"?"No hay notas válidas":"No valid notes"); return; }
+
+  document.getElementById("loadingBox").style.display = "none";
+  document.getElementById("content").style.display = "block";
+  currentLang = lang;
+  render(lang);
+}
+
+// ── Stats ─────────────────────────────────────────────────────────────────
+function renderStats(lang) {
+  const totalBags = NOTES.reduce((s,n)=>s+n.bags,0);
+  const totalSatsAll = NOTES.reduce((s,n)=>s+totalSats(n),0);
+  const totalZaps = NOTES.reduce((s,n)=>s+n.zaps.length,0);
+  const zappersUnicos = new Set(NOTES.flatMap(n=>n.zaps.map(z=>z.npub))).size;
+  const uniqueSpots = new Set(NOTES.map(n=>n.spotId).filter(Boolean)).size;
+  const avgBags = NOTES.length ? (totalBags/NOTES.length) : 0;
+  const avgSats = NOTES.length ? (totalSatsAll/NOTES.length) : 0;
+  const avgZaps = NOTES.length ? (totalZaps/NOTES.length) : 0;
+  // Time — exclude outings with 0/blank minutes from average
+  const totalMinutes = NOTES.reduce((s,n)=>s+(n.minutes||0),0);
+  const timedNotes = NOTES.filter(n=>n.minutes>0);
+  const avgMinutes = timedNotes.length ? Math.round(timedNotes.reduce((s,n)=>s+n.minutes,0)/timedNotes.length) : 0;
+  const totalHours = Math.floor(totalMinutes/60);
+  const totalMinsRem = totalMinutes % 60;
+  const totalTimeStr = totalHours > 0
+    ? totalHours+"h "+(totalMinsRem>0?totalMinsRem+"min":"")
+    : totalMinutes+"min";
+
+  // Best outing by sats
+  const byS = [...NOTES].sort((a,b)=>totalSats(b)-totalSats(a));
+  const bestSats = byS[0];
+  // Best outing by bags
+  const byB = [...NOTES].sort((a,b)=>b.bags-a.bags);
+  const bestBags = byB[0];
+  // Longest session by minutes
+  const byM = [...NOTES].filter(n=>n.minutes>0).sort((a,b)=>b.minutes-a.minutes);
+  const bestTime = byM[0] || null;
+
+  const dec = lang==="es" ? "," : ".";
+  const headline = (val, label) =>
+    '<div class="kook-headline-card">'+
+      '<span class="kook-headline-val">'+val+'</span>'+
+      '<span class="kook-headline-label">'+label+'</span>'+
+    '</div>';
+
+  // Tier 1 — the four numbers that answer "what happened"
+  const L = lang==="es"
+    ? { outings:"Salidas", bags:"Bolsas", sats:"Sats", time:"Tiempo" }
+    : { outings:"Outings", bags:"Bags", sats:"Sats", time:"Time" };
+
+  document.getElementById("headlineStats").innerHTML =
+    headline(NOTES.length, L.outings) +
+    headline(fmtBolsasNum(totalBags), L.bags) +
+    headline(fmtNum(totalSatsAll), L.sats) +
+    headline(totalTimeStr, L.time);
+
+  // Tier 2 — derived figures, one recessive line
+  const D = lang==="es"
+    ? { zaps:"zaps", zappers:"zappers", spots:"spots",
+        avgBags:"bolsas/salida", avgSats:"sats/salida", avgTime:"min/salida" }
+    : { zaps:"zaps", zappers:"zappers", spots:"spots",
+        avgBags:"bags/outing", avgSats:"sats/outing", avgTime:"min/outing" };
+
+  document.getElementById("derivedStats").innerHTML =
+    '<strong>'+totalZaps+'</strong> '+D.zaps+' · '+
+    '<strong>'+zappersUnicos+'</strong> '+D.zappers+' · '+
+    '<strong>'+uniqueSpots+'</strong> '+D.spots+' · '+
+    '<strong>'+avgBags.toFixed(1).replace(".",dec)+'</strong> '+D.avgBags+' · '+
+    '<strong>'+Math.round(avgSats)+'</strong> '+D.avgSats+' · '+
+    '<strong>'+avgMinutes+'</strong> '+D.avgTime;
+
+  // Best cards
+  const bestSatsLabel = lang==="es" ? "Salida más zapeada" : "Most zapped outing";
+  const bestBagsLabel = lang==="es" ? "Más bolsas"         : "Most bags";
+  const bestTimeLabel = lang==="es" ? "Sesión más larga"   : "Longest session";
+  const viewLabel = lang==="es" ? "ver nota" : "view note";
+
+  const bestCard = (label, val, note) =>
+    '<div class="kook-log-best-card">'+
+      '<span class="kook-log-best-label">'+label+'</span>'+
+      '<div class="kook-log-best-val">'+val+'</div>'+
+      '<div class="kook-log-best-meta">'+fmtFecha(note.date,lang)+' · <a href="'+noteUrl(note.eventId)+'" target="_blank" rel="noopener">'+viewLabel+'</a></div>'+
+    '</div>';
+
+  document.getElementById("bestGrid").innerHTML =
+    bestCard(bestSatsLabel, fmtNum(totalSats(bestSats))+' ⚡', bestSats) +
+    bestCard(bestBagsLabel, fmtBolsas2(bestBags.bags,lang)+' 💰', bestBags) +
+    (bestTime ? bestCard(bestTimeLabel, bestTime.minutes+' min ⏱️', bestTime) : '');
+}
+
+// ── Spot filter ───────────────────────────────────────────────────────────
+function setSpotFilter(spotId, lang) {
+  activeSpotFilter = spotId;
+  pageNotas = 0;
+  // Update chips
+  document.querySelectorAll(".kook-spot-chip").forEach(el => {
+    el.classList.toggle("active", el.dataset.spotId === spotId);
+  });
+  // Show filter status
+  const fs = document.getElementById("filterStatus");
+  const fl = document.getElementById("filterLabel");
+  if (spotId && SPOTS[spotId]) {
+    fs.style.display = "flex";
+    fl.textContent = (lang==="es" ? "Filtrando por: " : "Filtered by: ") + SPOTS[spotId].name;
+  } else {
+    fs.style.display = "none";
+  }
+  renderFeed(lang);
+}
+
+function clearSpotFilter() {
+  setSpotFilter(null, currentLang);
+}
+
+function renderSpotChips(lang) {
+  const ids = Object.keys(SPOTS);
+  if (ids.length === 0) { document.getElementById("spotChips").innerHTML = ""; return; }
+  // Count outings per spot
+  const counts = {};
+  NOTES.forEach(n => { if (n.spotId) counts[n.spotId] = (counts[n.spotId]||0)+1; });
+  const sorted = ids.filter(id => counts[id]).sort((a,b)=>(counts[b]||0)-(counts[a]||0));
+  document.getElementById("spotChips").innerHTML = sorted.map(id =>
+    '<button class="kook-spot-chip'+(activeSpotFilter===id?" active":"")+'" data-spot-id="'+id+'" onclick="setSpotFilter(\''+id+'\', currentLang)">'+
+      escHtml(SPOTS[id].name)+(counts[id]?' ('+counts[id]+')':'')+
+    '</button>'
+  ).join("");
+}
+
+// ── Sacred Spots cards ────────────────────────────────────────────────────
+function renderSpots(lang) {
+  const container = document.getElementById("spotsList");
+  if (!container) return;
+  const ids = Object.keys(SPOTS);
+  if (ids.length===0) { container.innerHTML=""; return; }
+  const stats = {};
+  ids.forEach(id=>{ stats[id]={outings:0,bags:0,minutes:0,sats:0,lastDate:"",lastEventId:""}; });
+  NOTES.forEach(n=>{
+    if (!n.spotId||!stats[n.spotId]) return;
+    const s=stats[n.spotId];
+    s.outings++;
+    s.bags+=n.bags;
+    s.minutes+=(n.minutes||0);
+    s.sats+=totalSats(n);
+    if (!s.lastDate||n.date.localeCompare(s.lastDate)>0){ s.lastDate=n.date; s.lastEventId=n.eventId; }
+  });
+  const sortedIds=ids.sort((a,b)=>stats[b].outings-stats[a].outings||(SPOTS[a].name||"").localeCompare(SPOTS[b].name||""));
+  const labels=lang==="es"
+    ?{outings:"salidas",bags:"bolsas",sats:"sats",last:"última salida",none:"aún sin salidas"}
+    :{outings:"outings",bags:"bags",sats:"sats",last:"latest outing",none:"no outings yet"};
+  const fmtSpotTime = (mins) => {
+    if (!mins) return "";
+    const h=Math.floor(mins/60), m=mins%60;
+    return h>0 ? h+"h"+(m>0?" "+m+"min":"") : m+"min";
+  };
+  container.innerHTML=sortedIds.map(id=>{
+    const spot=SPOTS[id], s=stats[id];
+    const mapUrl=spotMapUrl(spot.geohash);
+    const nameHtml=mapUrl?'<a href="'+mapUrl+'" target="_blank" rel="noopener" class="kook-spot-name-link">'+escHtml(spot.name)+'</a>':'<span>'+escHtml(spot.name)+'</span>';
+    const photo=spot.imageUrl?'<div class="kook-spot-photo"><img src="'+escHtml(spot.imageUrl)+'" alt="" loading="lazy"></div>':'';
+    const timeStr=fmtSpotTime(s.minutes);
+    let statsLine=s.outings===0?'<span class="kook-spot-stat kook-spot-stat-muted">'+labels.none+'</span>':
+      '<span class="kook-spot-stat"><strong>'+s.outings+'</strong> '+labels.outings+'</span>'+
+      '<span class="kook-spot-stat"><strong>'+fmtBolsasNum(s.bags)+'</strong> '+labels.bags+'</span>'+
+      (timeStr?'<span class="kook-spot-stat">⏱️ <strong>'+timeStr+'</strong></span>':'')+
+      '<span class="kook-spot-stat">⚡ <strong>'+fmtNum(s.sats)+'</strong> '+labels.sats+'</span>'+
+      '<span class="kook-spot-stat">'+labels.last+': <a href="'+noteUrl(s.lastEventId)+'" target="_blank" rel="noopener">'+fmtFecha(s.lastDate,lang)+'</a></span>';
+    const note=spot.note?'<p class="kook-spot-note">'+escHtml(spot.note)+'</p>':'';
+    return '<div class="kook-spot">'+photo+'<div class="kook-spot-body"><div class="kook-spot-name">'+nameHtml+'</div><div class="kook-spot-stats">'+statsLine+'</div>'+note+'</div></div>';
+  }).join("");
+}
+
+// ── Outings feed ──────────────────────────────────────────────────────────
+function renderFeed(lang) {
+  const feed = document.getElementById("outingsFeed");
+  if (!feed) return;
+  const source = activeSpotFilter
+    ? NOTES.filter(n => n.spotId === activeSpotFilter)
+    : NOTES;
+  const ordenadas = [...source].sort((a,b)=>{
+    const cmp=b.date.localeCompare(a.date);
+    return cmp!==0?cmp:parseInt(b.id)-parseInt(a.id);
+  });
+
+  const L = lang==="es"
+    ? { bags:"bolsas", bag:"bolsa", min:"min", noZap:"sin zaps todavía", zapIt:"⚡ Ver y zapear", view:"Ver nota" }
+    : { bags:"bags", bag:"bag", min:"min", noZap:"no zaps yet", zapIt:"⚡ View & zap", view:"View note" };
+
+  const page = ordenadas.slice(pageNotas*PAGE_SIZE_TABLE,(pageNotas+1)*PAGE_SIZE_TABLE);
+
+  feed.innerHTML = page.map(n => {
+    const sats = totalSats(n);
+    const spotName = (n.spotId && SPOTS[n.spotId]) ? SPOTS[n.spotId].name : "";
+    const altText = (lang==="es" ? "Salida del " : "Outing on ") + fmtFecha(n.date,lang) + (spotName ? " — " + spotName : "");
+
+    const thumb = n.imageUrl
+      ? '<a href="'+noteUrl(n.eventId)+'" target="_blank" rel="noopener" class="kook-feed-thumb"><img src="'+escHtml(n.imageUrl)+'" alt="'+escHtml(altText)+'" loading="lazy"></a>'
+      : '<div class="kook-feed-thumb"><div class="kook-feed-thumb-empty">🌊</div></div>';
+
+    // Zap line: avatars of zappers + sats total, or a zap CTA when empty
+    let zapLine;
+    if (n.zaps.length === 0) {
+      zapLine = '<span class="kook-feed-nozap">'+L.noZap+'</span>'+
+                ' <a href="'+noteUrl(n.eventId)+'" target="_blank" rel="noopener" class="kook-feed-zapcta">'+L.zapIt+'</a>';
+    } else {
+      const sortedZaps = [...n.zaps].sort((a,b)=>b.sats-a.sats);
+      const avatars = sortedZaps.slice(0,5).map(z=>zapperAvatar(z.npub,22)).join("");
+      const more = sortedZaps.length > 5 ? '<span class="kook-feed-num">+'+(sortedZaps.length-5)+'</span>' : '';
+      zapLine = '<span class="kook-feed-sats">'+fmtNum(sats)+' ⚡</span>'+
+                '<span class="kook-feed-avatars">'+avatars+'</span>'+more;
+    }
+
+    const bagsStr = fmtBolsas2(n.bags,lang);
+    const bagWord = (n.bags === 1) ? L.bag : L.bags;
+    const minPart = n.minutes ? ' · <strong>'+n.minutes+'</strong> '+L.min : '';
+
+    return '<div class="kook-feed-row">'+
+      thumb+
+      '<div class="kook-feed-body">'+
+        '<div class="kook-feed-top">'+
+          '<span class="kook-feed-date">'+fmtFecha(n.date,lang)+'</span>'+
+          (spotName ? '<span class="kook-feed-spot">'+escHtml(spotName)+'</span>' : '')+
+          '<span class="kook-feed-num">#'+n.id+'</span>'+
+        '</div>'+
+        '<div class="kook-feed-meta"><span><strong>'+bagsStr+'</strong> '+bagWord+minPart+'</span></div>'+
+        '<div class="kook-feed-zapline">'+zapLine+'</div>'+
+      '</div>'+
+      '<a href="'+noteUrl(n.eventId)+'" target="_blank" rel="noopener" class="kook-feed-link" title="'+escHtml(L.view)+'">›</a>'+
+    '</div>';
+  }).join("");
+
+  renderPagination("paginationNotas",pageNotas,ordenadas.length,"prevNotas","nextNotas",lang,PAGE_SIZE_TABLE);
+
+  // Summary line reflects the current (possibly filtered) set
+  const fBags = ordenadas.reduce((s,n)=>s+n.bags,0);
+  const fSats = ordenadas.reduce((s,n)=>s+totalSats(n),0);
+  const fMin  = ordenadas.reduce((s,n)=>s+(n.minutes||0),0);
+  const fHours = Math.floor(fMin/60), fRem = fMin%60;
+  const fTime = fHours>0 ? fHours+"h"+(fRem>0?" "+fRem+"min":"") : fMin+"min";
+  const S = lang==="es"
+    ? { showing:"Mostrando", outings:"salidas", bags:"bolsas", sats:"sats", time:"de limpieza" }
+    : { showing:"Showing", outings:"outings", bags:"bags", sats:"sats", time:"cleaning" };
+  document.getElementById("feedSummary").innerHTML =
+    S.showing+' <strong>'+ordenadas.length+'</strong> '+S.outings+' · '+
+    '<strong>'+fmtBolsasNum(fBags)+'</strong> '+S.bags+' · '+
+    '<strong>'+fmtNum(fSats)+'</strong> '+S.sats+' · '+
+    '<strong>'+fTime+'</strong> '+S.time;
+}
+
+// ── Pagination ────────────────────────────────────────────────────────────
+function renderPagination(containerId, page, total, onPrev, onNext, lang, pageSize) {
+  const ps = pageSize || PAGE_SIZE;
+  const totalPages = Math.ceil(total/ps);
+  if (totalPages<=1) { document.getElementById(containerId).innerHTML=""; return; }
+  const prev=lang==="es"?"← Anterior":"← Prev", next=lang==="es"?"Siguiente →":"Next →";
+  document.getElementById(containerId).innerHTML=
+    '<button onclick="'+onPrev+'()" '+(page===0?"disabled":"")+'>'+prev+'</button>'+
+    '<span class="kook-page-info">'+(page+1)+' / '+totalPages+'</span>'+
+    '<button onclick="'+onNext+'()" '+(page>=totalPages-1?"disabled":"")+'>'+next+'</button>';
+}
+function scrollToAnchor(id) { const el=document.getElementById(id); if(el) el.scrollIntoView({behavior:"smooth",block:"start"}); }
+function prevNotas(){ if(pageNotas>0){pageNotas--;renderFeed(currentLang);scrollToAnchor("outingsLogAnchor");} }
+function nextNotas(){ pageNotas++;renderFeed(currentLang);scrollToAnchor("outingsLogAnchor"); }
+
+// ── Main render + lang ────────────────────────────────────────────────────
+function render(lang) {
+  if (NOTES.length===0) return;
+  currentLang = lang;
+  renderStats(lang);
+  renderSpotChips(lang);
+  renderSpots(lang);
+  renderFeed(lang);
+}
+
+function setLang(lang) {
+  const root=document.getElementById("kookTrash");
+  if (lang==="en") root.classList.add("lang-en"); else root.classList.remove("lang-en");
+  document.getElementById("btnEs").classList.toggle("active",lang==="es");
+  document.getElementById("btnEn").classList.toggle("active",lang==="en");
+  if (NOTES.length>0) render(lang);
+}
+
+loadData();
+</script>
+</body>
+</html>
