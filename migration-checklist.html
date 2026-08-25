@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Photo Migration Checklist — Sats for Trash</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+    background: #fafafa;
+    color: #222;
+    margin: 0;
+    padding: 16px;
+    max-width: 640px;
+    margin: 0 auto;
+  }
+  h1 { font-size: 1.3em; margin: 0 0 4px 0; }
+  .subtitle { color: #777; font-size: 0.85em; margin: 0 0 16px 0; }
+  .howto {
+    background: #fffbf2;
+    border-left: 4px solid #f7931a;
+    padding: 12px 16px;
+    border-radius: 0 6px 6px 0;
+    font-size: 0.85em;
+    line-height: 1.6;
+    margin-bottom: 20px;
+  }
+  .howto ol { margin: 6px 0 0 0; padding-left: 20px; }
+  .progress-bar-wrap {
+    background: #eee;
+    border-radius: 6px;
+    height: 8px;
+    overflow: hidden;
+    margin: 8px 0 4px 0;
+  }
+  .progress-bar { background: #f7931a; height: 100%; transition: width 0.3s ease; }
+  .progress-label { font-size: 0.8em; color: #888; margin-bottom: 16px; }
+  h2 {
+    font-size: 1.05em;
+    margin: 24px 0 10px 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  h2 .count { font-size: 0.75em; color: #888; font-weight: 400; }
+  .row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: #fff;
+    border: 1px solid #eee;
+    border-radius: 8px;
+    padding: 8px 10px;
+    margin-bottom: 6px;
+  }
+  .row.done { opacity: 0.4; }
+  .row input[type=checkbox] { width: 20px; height: 20px; flex-shrink: 0; accent-color: #f7931a; }
+  .thumb {
+    width: 48px; height: 48px; border-radius: 5px; object-fit: cover;
+    background: #f0f0f0; flex-shrink: 0;
+  }
+  .thumb-empty {
+    width: 48px; height: 48px; border-radius: 5px; background: #f0f0f0;
+    display: flex; align-items: center; justify-content: center; font-size: 1.2em;
+    opacity: 0.3; flex-shrink: 0;
+  }
+  .info { flex: 1; min-width: 0; }
+  .id-badge {
+    font-family: 'SF Mono', Menlo, monospace;
+    font-weight: 700;
+    color: #f7931a;
+    font-size: 0.9em;
+  }
+  .filename {
+    font-family: 'SF Mono', Menlo, monospace;
+    font-size: 0.75em;
+    color: #999;
+    display: block;
+  }
+  .open-btn {
+    background: #111;
+    color: #f7931a;
+    text-decoration: none;
+    font-size: 0.8em;
+    font-weight: 600;
+    padding: 7px 12px;
+    border-radius: 5px;
+    flex-shrink: 0;
+    white-space: nowrap;
+  }
+  .no-photo { color: #bbb; font-size: 0.8em; font-style: italic; flex-shrink: 0; }
+  .loading, .error { text-align: center; padding: 40px 20px; color: #888; }
+  .reset-btn {
+    display: block;
+    margin: 24px auto 0 auto;
+    background: none;
+    border: 1px solid #ddd;
+    color: #999;
+    font-size: 0.8em;
+    padding: 8px 16px;
+    border-radius: 5px;
+  }
+</style>
+</head>
+<body>
+
+<h1>📸 Photo Migration Checklist</h1>
+<p class="subtitle">Sats for Trash — outings + spots, tap through in order</p>
+
+<div class="howto">
+  Per photo:
+  <ol>
+    <li>Tap <strong>Open</strong> → long-press the image → <strong>Download</strong></li>
+    <li>Open it in <strong>Squoosh</strong> → resize ~1200px, quality 75 → export</li>
+    <li>In Files app, rename the exported file to the <strong>filename shown below</strong></li>
+    <li>Move it into one local folder (e.g. <code>sats4trash-upload/</code>)</li>
+    <li>Tick the box — it's saved on this device so you can stop and resume anytime</li>
+  </ol>
+  When a section is fully ticked, batch-upload that folder's contents to the matching GitHub folder in one go.
+</div>
+
+<div id="app"><div class="loading">Loading from your sheet…</div></div>
+
+<script>
+const SHEET_ID = "1DRyYO2rM-hkRgXzJebkKYk5bj_BZaemFYZOU_7VnNJE";
+const URL_NOTES = "https://docs.google.com/spreadsheets/d/" + SHEET_ID + "/gviz/tq?tqx=out:csv&sheet=Notes";
+const URL_SPOTS = "https://docs.google.com/spreadsheets/d/" + SHEET_ID + "/gviz/tq?tqx=out:csv&sheet=Spots";
+
+function parseCSV(text) {
+  const rows = []; let row=[], cell="", inQuotes=false;
+  for (let i=0; i<text.length; i++) {
+    const c=text[i];
+    if (inQuotes) {
+      if (c==='"'&&text[i+1]==='"') { cell+='"'; i++; }
+      else if (c==='"') inQuotes=false; else cell+=c;
+    } else {
+      if (c==='"') inQuotes=true;
+      else if (c===',') { row.push(cell); cell=""; }
+      else if (c==='\n'||c==='\r') {
+        if (cell!==""||row.length>0) { row.push(cell); rows.push(row); row=[]; cell=""; }
+        if (c==='\r'&&text[i+1]==='\n') i++;
+      } else cell+=c;
+    }
+  }
+  if (cell!==""||row.length>0) { row.push(cell); rows.push(row); }
+  return rows;
+}
+
+async function fetchCsv(url) {
+  const res = await fetch(url);
+  if (!res.ok) throw new Error("HTTP " + res.status);
+  return parseCSV(await res.text());
+}
+
+async function getDone(prefix, id) {
+  try {
+    const r = await window.storage.get(prefix + id);
+    return r ? r.value === "1" : false;
+  } catch (e) { return false; }
+}
+async function setDone(prefix, id, val) {
+  try { await window.storage.set(prefix + id, val ? "1" : "0"); } catch (e) {}
+}
+
+function row(id, imageUrl, filename, isDone) {
+  const thumb = imageUrl
+    ? '<img class="thumb" src="'+imageUrl+'" loading="lazy" alt="">'
+    : '<div class="thumb-empty">🌊</div>';
+  const openBtn = imageUrl
+    ? '<a class="open-btn" href="'+imageUrl+'" target="_blank" rel="noopener">Open ↗</a>'
+    : '<span class="no-photo">no photo</span>';
+  return '<div class="row'+(isDone?' done':'')+'" data-id="'+id+'">'+
+    '<input type="checkbox" '+(isDone?'checked':'')+'>'+
+    thumb+
+    '<div class="info"><span class="id-badge">#'+id+'</span><span class="filename">→ '+filename+'</span></div>'+
+    openBtn+
+  '</div>';
+}
+
+async function renderSection(containerId, items, prefix) {
+  const el = document.getElementById(containerId);
+  const parts = [];
+  for (const it of items) {
+    const done = await getDone(prefix, it.id);
+    parts.push(row(it.id, it.imageUrl, it.filename, done));
+  }
+  el.innerHTML = parts.join("");
+  el.querySelectorAll(".row").forEach(rowEl => {
+    const id = rowEl.dataset.id;
+    const cb = rowEl.querySelector("input");
+    cb.addEventListener("change", async () => {
+      await setDone(prefix, id, cb.checked);
+      rowEl.classList.toggle("done", cb.checked);
+      recomputeProgress();
+    });
+  });
+}
+
+let ALL_OUTINGS = [], ALL_SPOTS = [];
+
+async function init() {
+  const app = document.getElementById("app");
+  let notesRows, spotsRows;
+  try {
+    [notesRows, spotsRows] = await Promise.all([fetchCsv(URL_NOTES), fetchCsv(URL_SPOTS)]);
+  } catch (e) {
+    app.innerHTML = '<div class="error">Could not load the sheet. Check your connection and reload.</div>';
+    return;
+  }
+
+  ALL_OUTINGS = notesRows.slice(1)
+    .filter(r => r[0])
+    .map(r => ({ id: String(r[0]).trim(), imageUrl: String(r[4]||"").trim() }))
+    .filter(n => n.imageUrl)
+    .map(n => ({ ...n, filename: n.id + ".jpg" }))
+    .sort((a,b) => parseInt(a.id) - parseInt(b.id));
+
+  ALL_SPOTS = spotsRows.slice(1)
+    .filter(r => r[0])
+    .map(r => ({ id: String(r[0]).trim(), imageUrl: String(r[4]||"").trim() }))
+    .filter(s => s.imageUrl)
+    .map(s => ({ ...s, filename: s.id + ".jpg" }))
+    .sort((a,b) => parseInt(a.id) - parseInt(b.id));
+
+  app.innerHTML =
+    '<div class="progress-bar-wrap"><div class="progress-bar" id="progressBar" style="width:0%"></div></div>' +
+    '<div class="progress-label" id="progressLabel">0 / ' + (ALL_OUTINGS.length + ALL_SPOTS.length) + ' migrated</div>' +
+    '<h2>🌅 Outings <span class="count">→ images/outings/</span></h2>' +
+    '<div id="outingsList"></div>' +
+    '<h2>🌀 Spots <span class="count">→ images/spots/</span></h2>' +
+    '<div id="spotsList"></div>' +
+    '<button class="reset-btn" onclick="resetAll()">Reset all checkmarks</button>';
+
+  await renderSection("outingsList", ALL_OUTINGS, "outing-done:");
+  await renderSection("spotsList", ALL_SPOTS, "spot-done:");
+  await recomputeProgress();
+}
+
+async function recomputeProgress() {
+  let done = 0;
+  for (const it of ALL_OUTINGS) if (await getDone("outing-done:", it.id)) done++;
+  for (const it of ALL_SPOTS) if (await getDone("spot-done:", it.id)) done++;
+  const total = ALL_OUTINGS.length + ALL_SPOTS.length;
+  document.getElementById("progressBar").style.width = (total ? (done/total*100) : 0) + "%";
+  document.getElementById("progressLabel").textContent = done + " / " + total + " migrated";
+}
+
+async function resetAll() {
+  if (!confirm("Clear all checkmarks? This can't be undone.")) return;
+  for (const it of ALL_OUTINGS) await setDone("outing-done:", it.id, false);
+  for (const it of ALL_SPOTS) await setDone("spot-done:", it.id, false);
+  await renderSection("outingsList", ALL_OUTINGS, "outing-done:");
+  await renderSection("spotsList", ALL_SPOTS, "spot-done:");
+  await recomputeProgress();
+}
+
+init();
+</script>
+</body>
+</html>
