@@ -456,12 +456,6 @@
 }
 .kook-trash .kook-pagination button:disabled { background: #e0e0e0; color: #aaa; cursor: default; }
 .kook-trash .kook-pagination .kook-page-info { color: #666; }
-/* Ranking */
-.kook-trash .kook-section-label {
-  font-family: var(--font-sans); font-size: var(--text-label); letter-spacing: var(--letter-label);
-  text-transform: uppercase; color: var(--brand-orange); font-weight: 600; margin-bottom: 8px; display: block;
-}
-.kook-trash .kook-section-desc { color: #888; font-family: var(--font-sans); font-size: var(--text-meta); margin: 4px 0 12px 0; }
 /* Sacred spots */
 .kook-trash .kook-spots { display: grid; grid-template-columns: 1fr; gap: 12px; margin: 16px 0; }
 .kook-trash .kook-spot {
@@ -501,9 +495,10 @@
 .kook-trash [data-lang-en] { display: none; }
 .kook-trash.lang-en [data-lang-es] { display: none; }
 .kook-trash.lang-en [data-lang-en] { display: block; }
-.kook-trash .kook-section-label[data-lang-en] { display: none; }
-.kook-trash.lang-en .kook-section-label[data-lang-es] { display: none; }
-.kook-trash.lang-en .kook-section-label[data-lang-en] { display: block; }
+.kook-trash .kook-nav [data-lang-es] { display: inline; }
+.kook-trash .kook-nav [data-lang-en] { display: none; }
+.kook-trash.lang-en .kook-nav [data-lang-es] { display: none; }
+.kook-trash.lang-en .kook-nav [data-lang-en] { display: inline; }
 @media (max-width: 600px) {
   .kook-trash { --text-h1: 1.8em; --text-h2: 1.2em; --text-lead: 1em; --text-body: 0.95em; --text-meta: 0.8em; --text-label: 0.7em; }
   .kook-trash .kook-headline-stats { grid-template-columns: repeat(2, 1fr); gap: 8px; }
@@ -534,7 +529,6 @@
   border-bottom: none;
 }
 .kook-trash .kook-header .kook-lang { margin-bottom: 0; }
-.kook-trash .kook-title-accent { color: var(--brand-orange); }
 </style>
 </head>
 <body>
@@ -542,9 +536,9 @@
 
   <div class="kook-header">
     <nav class="kook-nav">
-    <a href="index.html">Home</a>
-    <a href="log.html" class="active">Log</a>
-    <a href="about.html">About</a>
+      <a href="index.html"><span data-lang-es="">Inicio</span><span data-lang-en="">Home</span></a>
+      <a href="log.html" class="active"><span data-lang-es="">Registro</span><span data-lang-en="">Log</span></a>
+      <a href="about.html"><span data-lang-es="">Acerca de</span><span data-lang-en="">About</span></a>
     </nav>
     <div class="kook-lang">
     <button class="active" id="btnEn" onclick="setLang('en')">EN</button>
@@ -630,9 +624,8 @@ const URL_NOTES   = "https://docs.google.com/spreadsheets/d/" + SHEET_ID + "/gvi
 const URL_ZAPS    = "https://docs.google.com/spreadsheets/d/" + SHEET_ID + "/gviz/tq?tqx=out:csv&sheet=Zaps";
 const URL_ZAPPERS = "https://docs.google.com/spreadsheets/d/" + SHEET_ID + "/gviz/tq?tqx=out:csv&sheet=Zappers";
 const URL_SPOTS   = "https://docs.google.com/spreadsheets/d/" + SHEET_ID + "/gviz/tq?tqx=out:csv&sheet=Spots";
-const URL_OUTERS  = "https://docs.google.com/spreadsheets/d/" + SHEET_ID + "/gviz/tq?tqx=out:csv&sheet=outers";
 
-let NOTES = [], ZAPPERS = {}, SPOTS = {}, OUTERS = {};
+let NOTES = [], ZAPPERS = {}, SPOTS = {};
 let currentLang = "en";
 let pageNotas = 0;
 let activeSpotFilter = null; // null = no filter, string = spot id
@@ -666,7 +659,6 @@ function noteUrl(eventId) { return "https://primal.net/e/"+eventId; }
 // original imageUrl (Blossom/Primal) via onerror.
 function localOutingImage(id) { return "images/outings/"+id+".jpg"; }
 function localSpotImage(spotId) { return "images/spots/"+spotId+".jpg"; }
-function profileUrl(npub) { return "https://primal.net/p/"+npub; }
 function shortNpub(npub) {
   if (!npub || npub.length < 20) return npub;
   return npub.slice(0,12)+"…"+npub.slice(-8);
@@ -674,9 +666,6 @@ function shortNpub(npub) {
 function zapperDisplay(npub) {
   const z = ZAPPERS[npub];
   return (z && z.displayName) ? z.displayName : shortNpub(npub);
-}
-function zapperLink(npub) {
-  return '<a href="'+profileUrl(npub)+'" target="_blank" rel="noopener">'+escHtml(zapperDisplay(npub))+'</a>';
 }
 function npubColor(npub) {
   let hash = 0;
@@ -688,9 +677,9 @@ function zapperAvatar(npub, size) {
   const z = ZAPPERS[npub];
   const pic = z && z.picture;
   const dim = 'width:'+size+'px;height:'+size+'px;border-radius:50%;display:inline-block;vertical-align:middle;flex-shrink:0;';
-  if (pic) return '<img src="'+escHtml(pic)+'" alt="" style="'+dim+'object-fit:cover">';
+  if (pic) return '<img class="kook-avatar" src="'+escHtml(pic)+'" alt="" style="'+dim+'object-fit:cover">';
   const fontSize = Math.round(size * 0.45);
-  return '<span style="'+dim+'background:'+npubColor(npub)+';color:#fff;text-align:center;line-height:'+size+'px;font-family:var(--font-sans);font-weight:600;font-size:'+fontSize+'px">'+escHtml(zapperInitial(npub))+'</span>';
+  return '<span class="kook-avatar kook-avatar-fallback" style="'+dim+'background:'+npubColor(npub)+';color:#fff;text-align:center;line-height:'+size+'px;font-family:var(--font-sans);font-weight:600;font-size:'+fontSize+'px">'+escHtml(zapperInitial(npub))+'</span>';
 }
 function decodeGeohash(gh) {
   if (!gh) return null;
@@ -752,7 +741,9 @@ function showError(msg) {
   const eb = document.getElementById("errorBox");
   eb.style.display = "block"; eb.innerHTML = "";
   const p = document.createElement("p"); p.className = "kook-error-message";
-  p.textContent = lang==="es" ? "No se pudieron cargar los datos." : "Could not load data.";
+  p.textContent = lang==="es"
+    ? "No se pudieron cargar los datos. Comprueba la conexión o que la hoja sea pública."
+    : "Could not load data. Check the connection or that the spreadsheet is public.";
   eb.appendChild(p);
   if (msg) { const d=document.createElement("p"); d.className="kook-error-detail"; d.textContent=msg; eb.appendChild(d); }
   const btn = document.createElement("button"); btn.className="kook-retry-btn";
@@ -772,9 +763,9 @@ async function fetchCsv(url, label) {
 async function loadData() {
   const lang = getLang();
   document.getElementById("warningBox").style.display = "none";
-  const [notesR, zapsR, zappersR, spotsR, outersR] = await Promise.allSettled([
+  const [notesR, zapsR, zappersR, spotsR] = await Promise.allSettled([
     fetchCsv(URL_NOTES,"Notes"), fetchCsv(URL_ZAPS,"Zaps"),
-    fetchCsv(URL_ZAPPERS,"Zappers"), fetchCsv(URL_SPOTS,"Spots"), fetchCsv(URL_OUTERS,"outers")
+    fetchCsv(URL_ZAPPERS,"Zappers"), fetchCsv(URL_SPOTS,"Spots")
   ]);
   if (notesR.status==="rejected") { showError(notesR.reason&&notesR.reason.message); return; }
   const rowsN = notesR.value;
@@ -794,10 +785,9 @@ async function loadData() {
       if (!r[0]||!r[1]) return;
       const id=String(r[0]).trim(), npub=String(r[1]).trim();
       const sats=parseInt(String(r[2]).replace(/[^\d-]/g,""),10)||0;
-      const zapDate=normalizaFecha(String(r[3]||"").trim())||"";
       const zappedOuter=String(r[4]||"").trim();
       if (!zapsById[id]) zapsById[id]=[];
-      zapsById[id].push({npub,sats,zapDate,zappedOuter});
+      zapsById[id].push({npub,sats,zappedOuter});
     });
   } else showWarning(lang==="es" ? "⚠ No se pudo cargar Zaps." : "⚠ Could not load Zaps tab.");
 
@@ -809,14 +799,6 @@ async function loadData() {
     });
   }
 
-  OUTERS = {};
-  if (outersR.status==="fulfilled") {
-    outersR.value.slice(1).forEach(r => {
-      if (!r[0]) return;
-      OUTERS[String(r[0]).trim()] = { displayName:String(r[1]||"").trim(), npub:String(r[2]||"").trim(), nip05:String(r[3]||"").trim(), lnAddress:String(r[4]||"").trim(), imageUrl:String(r[5]||"").trim() };
-    });
-  }
-
   NOTES = [];
   for (let i=1; i<rowsN.length; i++) {
     const r=rowsN[i];
@@ -825,7 +807,7 @@ async function loadData() {
     const bags=parseFloat(String(r[3]).replace(",","."))||0;
     const imageUrl=String(r[4]||"").trim(), spotId=String(r[5]||"").trim(), outerId=String(r[6]||"").trim();
     const minutes=parseInt(String(r[7]||"").trim())||0;
-    const zaps=(zapsById[id]||[]).map(z=>({npub:z.npub,sats:z.sats,zapDate:z.zapDate,zappedOuter:z.zappedOuter}));
+    const zaps=(zapsById[id]||[]).map(z=>({npub:z.npub,sats:z.sats,zappedOuter:z.zappedOuter}));
     NOTES.push({id,date,eventId,bags,imageUrl,spotId,outerId,minutes,zaps});
   }
   if (NOTES.length===0) { showError(lang==="es"?"No hay notas válidas":"No valid notes"); return; }
@@ -1160,7 +1142,15 @@ function renderPagination(containerId, page, total, onPrev, onNext, lang, pageSi
     '<span class="kook-page-info">'+(page+1)+' / '+totalPages+'</span>'+
     '<button onclick="'+onNext+'()" '+(page>=totalPages-1?"disabled":"")+'>'+next+'</button>';
 }
-function scrollToAnchor(id) { const el=document.getElementById(id); if(el) el.scrollIntoView({behavior:"smooth",block:"start"}); }
+// After paginating, scroll the section anchor into view so the user lands on the
+// new page contents. Uses a manual offset calculation rather than scrollIntoView,
+// which can land a little off on mobile browsers with a collapsing address bar.
+function scrollToAnchor(id) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  const targetY = el.getBoundingClientRect().top + window.scrollY;
+  window.scrollTo({ top: targetY, behavior: "smooth" });
+}
 function prevNotas(){ if(pageNotas>0){pageNotas--;renderFeed(currentLang);scrollToAnchor("outingsLogAnchor");} }
 function nextNotas(){ pageNotas++;renderFeed(currentLang);scrollToAnchor("outingsLogAnchor"); }
 
@@ -1177,6 +1167,7 @@ function render(lang) {
 function setLang(lang) {
   const root=document.getElementById("kookTrash");
   if (lang==="en") root.classList.add("lang-en"); else root.classList.remove("lang-en");
+  document.documentElement.lang = lang;
   document.getElementById("btnEs").classList.toggle("active",lang==="es");
   document.getElementById("btnEn").classList.toggle("active",lang==="en");
   if (NOTES.length>0) render(lang);

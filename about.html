@@ -203,6 +203,10 @@
 .kook-trash [data-lang-en] { display: none; }
 .kook-trash.lang-en [data-lang-es] { display: none; }
 .kook-trash.lang-en [data-lang-en] { display: block; }
+.kook-trash .kook-nav [data-lang-es] { display: inline; }
+.kook-trash .kook-nav [data-lang-en] { display: none; }
+.kook-trash.lang-en .kook-nav [data-lang-es] { display: none; }
+.kook-trash.lang-en .kook-nav [data-lang-en] { display: inline; }
 .kook-trash .kook-manifesto-toggle[data-lang-en] { display: none; }
 .kook-trash.lang-en .kook-manifesto-toggle[data-lang-es] { display: none; }
 .kook-trash.lang-en .kook-manifesto-toggle[data-lang-en] { display: block; }
@@ -240,9 +244,9 @@
 
   <div class="kook-header">
     <nav class="kook-nav">
-    <a href="index.html">Home</a>
-    <a href="log.html">Log</a>
-    <a href="about.html" class="active">About</a>
+      <a href="index.html"><span data-lang-es="">Inicio</span><span data-lang-en="">Home</span></a>
+      <a href="log.html"><span data-lang-es="">Registro</span><span data-lang-en="">Log</span></a>
+      <a href="about.html" class="active"><span data-lang-es="">Acerca de</span><span data-lang-en="">About</span></a>
     </nav>
     <div class="kook-lang">
     <button class="active" id="btnEn" onclick="setLang('en')">EN</button>
