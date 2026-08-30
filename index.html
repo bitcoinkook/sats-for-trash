@@ -566,7 +566,7 @@
 .kook-trash .kook-rank-detail { font-family: var(--font-mono); font-size: var(--text-meta); color: #888; }
 .kook-trash table.kook-data .kook-num-orange { color: var(--brand-orange); font-family: var(--font-mono); }
 .kook-trash .kook-section-desc { color: #888; font-family: var(--font-sans); font-size: var(--text-meta); margin: 4px 0 12px 0; }
-.kook-trash .kook-milestone-subtitle { font-family: var(--font-sans); font-size: var(--text-meta); color: #888; margin: 4px 0 10px 0; }
+.kook-trash .kook-milestone-subtitle { font-family: var(--font-serif); font-size: var(--text-meta); color: #888; margin: 4px 0 10px 0; }
 .kook-trash .kook-zap-empty { color: #aaa; }
 .kook-trash .kook-ranking ol li strong a:hover { border-bottom-color: var(--brand-orange); }
 .kook-trash .kook-last-note {
@@ -1918,8 +1918,27 @@ function setLang(lang) {
   document.documentElement.lang = lang;
   document.getElementById("btnEs").classList.toggle("active",lang==="es");
   document.getElementById("btnEn").classList.toggle("active",lang==="en");
+  saveLangPreference(lang);
   if (NOTES.length>0) render(lang);
 }
+
+// Remember the chosen language across pages (Home/Log/About), wrapped in
+// try/catch since localStorage can throw in private-browsing modes.
+function saveLangPreference(lang) {
+  try { localStorage.setItem("sats4trash-lang", lang); } catch (e) {}
+}
+function restoreLangPreference() {
+  let saved = null;
+  try { saved = localStorage.getItem("sats4trash-lang"); } catch (e) {}
+  if (saved !== "es" && saved !== "en") return;
+  currentLang = saved;
+  const root = document.getElementById("kookTrash");
+  if (saved === "en") root.classList.add("lang-en"); else root.classList.remove("lang-en");
+  document.documentElement.lang = saved;
+  document.getElementById("btnEs").classList.toggle("active", saved === "es");
+  document.getElementById("btnEn").classList.toggle("active", saved === "en");
+}
+restoreLangPreference();
 
 function toggleNormie(lang) {
   const id  = lang === "es" ? "normieEs"       : "normieEn";

@@ -1170,8 +1170,27 @@ function setLang(lang) {
   document.documentElement.lang = lang;
   document.getElementById("btnEs").classList.toggle("active",lang==="es");
   document.getElementById("btnEn").classList.toggle("active",lang==="en");
+  saveLangPreference(lang);
   if (NOTES.length>0) render(lang);
 }
+
+// Remember the chosen language across pages (Home/Log/About), wrapped in
+// try/catch since localStorage can throw in private-browsing modes.
+function saveLangPreference(lang) {
+  try { localStorage.setItem("sats4trash-lang", lang); } catch (e) {}
+}
+function restoreLangPreference() {
+  let saved = null;
+  try { saved = localStorage.getItem("sats4trash-lang"); } catch (e) {}
+  if (saved !== "es" && saved !== "en") return;
+  currentLang = saved;
+  const root = document.getElementById("kookTrash");
+  if (saved === "en") root.classList.add("lang-en"); else root.classList.remove("lang-en");
+  document.documentElement.lang = saved;
+  document.getElementById("btnEs").classList.toggle("active", saved === "es");
+  document.getElementById("btnEn").classList.toggle("active", saved === "en");
+}
+restoreLangPreference();
 
 loadData();
 </script>

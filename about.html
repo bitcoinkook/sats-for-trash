@@ -259,10 +259,8 @@
   <!-- INTRO -->
   <h2 data-lang-es="">¿Qué es esto?</h2>
   <h2 data-lang-en="">What this is</h2>
-  <p data-lang-es="">Un registro público de limpiezas de basura. Cada salida tiene una foto, una nota en Nostr y un recuento de bolsas recogidas. Los datos viven en una hoja de cálculo que cualquiera puede leer. La página se actualiza sola.</p>
-  <p data-lang-es="">Eso es todo.</p>
-  <p data-lang-en="">A public log of trash cleanups. Every outing gets a photo, a note on Nostr, and a count of bags collected. The data lives in a spreadsheet anyone can read. The page updates automatically.</p>
-  <p data-lang-en="">That's it.</p>
+  <p data-lang-es="">Un registro público de limpiezas de basura. Cada salida tiene una foto, una nota en Nostr y un recuento de bolsas recogidas. Los datos viven en una hoja de cálculo que cualquiera puede leer.</p>
+  <p data-lang-en="">A public log of trash cleanups. Every outing gets a photo, a note on Nostr, and a count of bags collected. The data lives in a spreadsheet anyone can read.</p>
 
   <!-- NORMIE EXPLAINER -->
   <h2 data-lang-es="">¿Primera vez aquí?</h2>
@@ -286,19 +284,19 @@
     </div>
   </div>
 
-  <h2 data-lang-es="">Cómo empezó</h2>
-  <h2 data-lang-en="">How it started</h2>
-  <p data-lang-es="">Necesitaba algo que hacer por la mañana que no fuera liarme un porro. Recoger basura estaba suficientemente cerca de casa, llevaba entre 10 y 30 minutos, y dejaba algo visible detrás. Empecé a registrarlo porque medir las cosas ayuda a seguir haciéndolas.</p>
-  <p data-lang-es="">Los zaps llegaron después. Alguien vio la nota en Nostr y envió sats. Luego otros hicieron lo mismo. La limpieza no cambió — ya ocurría. El dinero es un efecto secundario, no el objetivo.</p>
-  <p data-lang-en="">I needed something to do in the morning that wasn't rolling a joint. Picking up trash was close enough to the door, took 10 to 30 minutes, and left something visible behind. I started logging it because measuring things makes them easier to keep doing.</p>
-  <p data-lang-en="">The zaps came later. Someone saw the note on Nostr and sent sats. Then others did. Nothing changed about the cleanup — it was already happening. The money is a side effect, not the point.</p>
-
   <h2 data-lang-es="">Por qué Nostr y Bitcoin</h2>
   <h2 data-lang-en="">Why Nostr and Bitcoin</h2>
   <p data-lang-es="">Ninguna plataforma controla esto. Ningún procesador de pagos puede bloquearlo. Las notas son mías, las claves son mías, los sats van directamente del emisor a mi wallet. Si este sitio desaparece mañana, las notas siguen en Nostr.</p>
   <p data-lang-es="">Esa es la única razón por la que estas herramientas están aquí — eliminan las partes que normalmente fallan.</p>
   <p data-lang-en="">No platform owns this. No payment processor can block it. The notes are mine, the keys are mine, the sats go directly from the sender to my wallet. If this site disappears tomorrow, the notes are still on Nostr.</p>
   <p data-lang-en="">That's the only reason these tools are here — they remove the parts that usually break.</p>
+
+  <h2 data-lang-es="">Qué tan verificable es esto</h2>
+  <h2 data-lang-en="">How verifiable this actually is</h2>
+  <p data-lang-es="">Esto no es a prueba de trampas, y no pretende serlo. Cada nota en Nostr está firmada y con marca de tiempo — no puedo editarla ni cambiarle la fecha después sin que se note, y si esta página desaparece las notas siguen existiendo en otro sitio. Los zaps son pagos Lightning reales, registrados en la propia nota, de wallet a wallet.</p>
+  <p data-lang-es="">Lo que nada de esto impide: podría crear una segunda cuenta de Nostr y zapearme a mí mismo para inflar los números. Podría fotografiar basura que no recogí, o generar una foto con IA. Nada aquí demuestra que eso no ocurra — solo hace que comprobarlo sea más fácil que falsificarlo bien.</p>
+  <p data-lang-en="">This isn't cheat-proof, and it doesn't claim to be. Each note on Nostr is signed and timestamped — I can't quietly edit or backdate one, and if this page disappears the notes still exist elsewhere. Zaps are real Lightning payments, recorded on the note itself, wallet to wallet.</p>
+  <p data-lang-en="">What none of that stops: I could spin up a second Nostr account and zap myself to inflate the numbers. I could photograph trash I didn't actually collect, or generate a photo with AI. Nothing here proves that isn't happening — it just makes it easier to check than to fake well.</p>
 
   <!-- HOW TO BECOME A CONTRIBUTOR -->
   <h2 data-lang-es="">Cómo convertirse en Colaborador</h2>
@@ -420,21 +418,31 @@ function setLang(lang) {
   const root = document.getElementById("kookTrash");
   if (lang === "en") root.classList.add("lang-en");
   else root.classList.remove("lang-en");
+  document.documentElement.lang = lang;
   document.getElementById("btnEs").classList.toggle("active", lang === "es");
   document.getElementById("btnEn").classList.toggle("active", lang === "en");
   currentLang = lang;
+  saveLangPreference(lang);
 }
 
-function toggleNormie(lang) {
-  const id  = lang === "es" ? "normieEs" : "normieEn";
-  const btn = lang === "es" ? "toggleNormieEs" : "toggleNormieEn";
-  const el  = document.getElementById(id);
-  const isOpen = el.classList.contains("open");
-  el.classList.toggle("open");
-  document.getElementById(btn).textContent = isOpen
-    ? (lang === "es" ? "► ¿Primera vez aquí? Qué es Nostr, los sats y los zaps" : "► What the heck's Nostr, sats and zaps")
-    : (lang === "es" ? "▼ Cerrar" : "▼ Close");
+// Remember the chosen language across pages (Home/Log/About), wrapped in
+// try/catch since localStorage can throw in private-browsing modes.
+function saveLangPreference(lang) {
+  try { localStorage.setItem("sats4trash-lang", lang); } catch (e) {}
 }
+function restoreLangPreference() {
+  let saved = null;
+  try { saved = localStorage.getItem("sats4trash-lang"); } catch (e) {}
+  if (saved !== "es" && saved !== "en") return;
+  currentLang = saved;
+  const root = document.getElementById("kookTrash");
+  if (saved === "en") root.classList.add("lang-en"); else root.classList.remove("lang-en");
+  document.documentElement.lang = saved;
+  document.getElementById("btnEs").classList.toggle("active", saved === "es");
+  document.getElementById("btnEn").classList.toggle("active", saved === "en");
+}
+restoreLangPreference();
+
 
 function toggleManifesto(lang) {
   const id  = lang === "es" ? "manifestoEs" : "manifestoEn";
