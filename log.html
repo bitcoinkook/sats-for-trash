@@ -132,316 +132,160 @@
   margin-top: 8px;
   font-weight: 500;
 }
-/* Derived stats — recessive single line */
-.kook-trash .kook-derived-stats {
+/* Supporting metric inside the card — replaces the old orphan text line */
+.kook-trash .kook-headline-sub {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 0.72em;
+  color: #8a8a8a;
+  margin-top: 7px;
+  padding-top: 7px;
+  border-top: 1px solid #2e2e2e;
+  line-height: 1.3;
+}
+.kook-trash .kook-headline-sub b { color: #cfcfcf; font-weight: 600; }
+/* Monthly charts — one small chart per metric, each with its own scale */
+.kook-trash .kook-charts {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+  margin: 22px 0 8px 0;
+}
+.kook-trash .kook-chart { min-width: 0; }
+.kook-trash .kook-chart-title {
   font-family: var(--font-sans);
-  font-size: var(--text-meta);
-  color: #888;
-  text-align: center;
-  margin: 0 0 8px 0;
-  line-height: 1.8;
-}
-.kook-trash .kook-derived-stats strong {
-  font-family: var(--font-mono);
-  color: #555;
+  font-size: var(--text-label);
+  letter-spacing: var(--letter-label);
+  text-transform: uppercase;
+  color: #999;
   font-weight: 600;
+  margin-bottom: 12px;
+  display: block;
 }
-/* Outings feed */
-.kook-trash .kook-feed {
+.kook-trash .kook-chart-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+.kook-trash .kook-chart-inner { min-width: 100%; }
+.kook-trash .kook-chart-plot {
+  display: flex;
+  align-items: flex-end;
+  gap: 5px;
+  height: 120px;
+  border-bottom: 1px solid #e6e6e6;
+}
+.kook-trash .kook-vbar-wrap {
+  flex: 1 0 auto;
+  min-width: 26px;
+  height: 100%;
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  margin: 14px 0;
-}
-.kook-trash .kook-feed-row {
-  display: flex;
-  gap: 12px;
-  align-items: stretch;
-  background: #fff;
-  border: 1px solid #eee;
-  border-radius: 8px;
-  padding: 10px;
-  transition: border-color 0.15s ease, box-shadow 0.15s ease;
-}
-.kook-trash .kook-feed-row:hover {
-  border-color: var(--brand-orange);
-  box-shadow: 0 1px 6px rgba(247,147,26,0.12);
-}
-.kook-trash .kook-feed-thumb {
-  flex-shrink: 0;
-  width: 96px;
-  height: 96px;
-  border-radius: 5px;
-  overflow: hidden;
-  background: #f0f0f0;
-  display: block;
-}
-.kook-trash .kook-feed-thumb img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-}
-.kook-trash .kook-feed-thumb-empty {
-  width: 100%;
-  height: 100%;
-  display: flex;
+  justify-content: flex-end;
   align-items: center;
-  justify-content: center;
-  font-size: 1.4em;
-  opacity: 0.25;
 }
-.kook-trash .kook-feed-body {
-  flex: 1;
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  gap: 3px;
-}
-.kook-trash .kook-feed-top {
-  display: flex;
-  align-items: baseline;
-  gap: 8px;
-  flex-wrap: wrap;
-}
-.kook-trash .kook-feed-date {
+.kook-trash .kook-vbar-val {
   font-family: var(--font-mono);
-  font-size: var(--text-meta);
-  font-weight: 700;
-  color: var(--brand-orange);
+  font-size: 9px;
+  color: #777;
+  line-height: 1;
+  margin-bottom: 3px;
   white-space: nowrap;
 }
-.kook-trash .kook-feed-spot {
+.kook-trash .kook-vbar {
+  width: 100%;
+  background: var(--brand-orange);
+  border-radius: 3px 3px 0 0;
+  min-height: 2px;
+  transition: height 0.5s ease;
+}
+/* Month still in progress — hatched so the partial total doesn't read as a decline */
+.kook-trash .kook-vbar-partial {
+  background: repeating-linear-gradient(
+    135deg,
+    var(--brand-orange) 0 4px,
+    #fbc47d 4px 8px
+  );
+}
+.kook-trash .kook-chart-axis { display: flex; gap: 5px; margin-top: 7px; }
+.kook-trash .kook-chart-xlabel {
+  flex: 1 0 auto;
+  min-width: 26px;
+  text-align: center;
+  font-family: var(--font-mono);
+  font-size: 9px;
+  color: #999;
+  white-space: nowrap;
+}
+.kook-trash .kook-chart-xlabel-partial { color: #c79030; }
+.kook-trash .kook-chart-note {
+  font-family: var(--font-sans);
+  font-size: var(--text-label);
+  color: #aaa;
+  margin-top: 8px;
+}
+/* Special finds */
+.kook-trash .kook-finds {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 16px 0;
+}
+.kook-trash .kook-find {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: #f9f9f9;
+  border: 1px solid #e8e8e8;
+  border-radius: 6px;
+  padding: 10px 12px;
+}
+.kook-trash .kook-find-icon {
+  font-size: 1.5em;
+  line-height: 1;
+  flex-shrink: 0;
+  width: 1.5em;
+  text-align: center;
+}
+.kook-trash .kook-find-body { flex: 1; min-width: 0; }
+.kook-trash .kook-find-name {
   font-family: var(--font-serif);
   font-size: var(--text-body);
   font-weight: 600;
   color: #111;
-  min-width: 0;
-  word-break: break-word;
+  line-height: 1.2;
 }
-.kook-trash .kook-feed-num {
-  font-family: var(--font-mono);
-  font-size: var(--text-label);
-  color: #999;
-  white-space: nowrap;
-}
-.kook-trash .kook-feed-meta {
-  font-family: var(--font-sans);
-  font-size: var(--text-meta);
-  color: #777;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 4px 12px;
-  align-items: center;
-}
-.kook-trash .kook-feed-meta strong {
-  font-family: var(--font-mono);
-  color: #444;
-  font-weight: 600;
-}
-.kook-trash .kook-feed-sats {
+.kook-trash .kook-find-count {
   font-family: var(--font-mono);
   font-size: var(--text-meta);
-  font-weight: 700;
   color: var(--brand-orange);
-  white-space: nowrap;
-}
-.kook-trash .kook-feed-zapline {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  flex-wrap: wrap;
-  margin-top: 1px;
-}
-.kook-trash .kook-feed-avatars {
-  display: flex;
-  align-items: center;
-}
-.kook-trash .kook-feed-avatars > * {
-  margin-right: -6px;
-  border: 1.5px solid #fff;
-  border-radius: 50%;
-}
-.kook-trash .kook-feed-avatars > *:last-child { margin-right: 0; }
-.kook-trash .kook-feed-nozap {
-  font-family: var(--font-sans);
-  font-size: var(--text-meta);
-  color: #bbb;
-  font-style: italic;
-}
-.kook-trash .kook-feed-zapcta {
-  font-family: var(--font-sans);
-  font-size: var(--text-label);
-  font-weight: 600;
-  color: var(--brand-orange);
-  text-decoration: none;
-  border-bottom: 1px dotted var(--brand-orange);
-  white-space: nowrap;
-}
-.kook-trash .kook-feed-zapcta:hover { border-bottom-style: solid; }
-.kook-trash .kook-feed-link {
-  flex-shrink: 0;
-  display: flex;
-  align-items: center;
-  padding-left: 4px;
-  font-family: var(--font-sans);
-  font-size: 1.1em;
-  color: #ccc;
-  text-decoration: none;
-}
-.kook-trash .kook-feed-link:hover { color: var(--brand-orange); }
-/* Feed summary line */
-.kook-trash .kook-feed-summary {
-  font-family: var(--font-sans);
-  font-size: var(--text-meta);
-  color: #888;
-  margin: 10px 0 0 0;
-  padding: 8px 12px;
-  background: #fafafa;
-  border-radius: 5px;
-  text-align: center;
-}
-.kook-trash .kook-feed-summary strong {
-  font-family: var(--font-mono);
-  color: #444;
   font-weight: 700;
 }
-/* Best outing cards */
-.kook-trash .kook-log-best {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 8px;
-  margin: 16px 0;
+.kook-trash .kook-find-thumbs {
+  display: flex;
+  gap: 5px;
+  flex-wrap: wrap;
+  margin-top: 6px;
 }
-.kook-trash .kook-log-best-card {
-  background: #1a1a1a;
-  color: #fff;
-  border-radius: 8px;
-  padding: 12px 10px;
-  text-align: center;
-}
-.kook-trash .kook-log-best-label {
-  font-family: var(--font-sans);
-  font-size: var(--text-label);
-  letter-spacing: var(--letter-label);
-  text-transform: uppercase;
-  color: #aaa;
-  font-weight: 500;
-  margin-bottom: 6px;
+.kook-trash .kook-find-thumb {
   display: block;
-}
-.kook-trash .kook-log-best-val {
-  font-family: var(--font-mono);
-  font-size: 1.15em;
-  font-weight: 700;
-  color: var(--brand-orange);
-  line-height: 1.1;
-}
-.kook-trash .kook-log-best-meta {
-  font-family: var(--font-sans);
-  font-size: var(--text-meta);
-  color: #aaa;
-  margin-top: 4px;
-}
-.kook-trash .kook-log-best-meta a {
-  color: #aaa;
-  text-decoration: none;
-  border-bottom: 1px dotted #555;
-}
-.kook-trash .kook-log-best-meta a:hover { border-bottom-color: var(--brand-orange); color: var(--brand-orange); }
-/* Filter + sort controls */
-.kook-trash .kook-controls {
-  display: flex;
-  gap: 10px;
-  margin: 16px 0 14px 0;
-  flex-wrap: wrap;
-}
-.kook-trash .kook-control {
-  flex: 1;
-  min-width: 140px;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-.kook-trash .kook-control-label {
-  font-family: var(--font-sans);
-  font-size: var(--text-label);
-  letter-spacing: var(--letter-label);
-  text-transform: uppercase;
-  color: #999;
-  font-weight: 600;
-}
-.kook-trash .kook-control select {
-  font-family: var(--font-sans);
-  font-size: var(--text-meta);
-  color: #333;
-  padding: 8px 10px;
-  border: 1px solid #ddd;
-  border-radius: 6px;
-  background: #fff;
-  cursor: pointer;
-  width: 100%;
-  appearance: none;
-  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='2'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
-  background-repeat: no-repeat;
-  background-position: right 8px center;
-  background-size: 16px;
-  padding-right: 30px;
-}
-.kook-trash .kook-control select:focus {
-  outline: none;
-  border-color: var(--brand-orange);
-}
-/* Monthly bars */
-.kook-trash .kook-monthly {
-  margin: 18px 0 8px 0;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-.kook-trash .kook-month-row {
-  display: grid;
-  grid-template-columns: 58px 1fr auto;
-  align-items: center;
-  gap: 10px;
-}
-.kook-trash .kook-month-label {
-  font-family: var(--font-mono);
-  font-size: var(--text-meta);
-  color: #888;
-  white-space: nowrap;
-}
-.kook-trash .kook-month-track {
-  background: #f0f0f0;
+  width: 46px;
+  height: 46px;
   border-radius: 4px;
-  height: 14px;
   overflow: hidden;
+  background: #eee;
+  flex-shrink: 0;
+  position: relative;
 }
-.kook-trash .kook-month-bar {
-  height: 100%;
-  background: var(--brand-orange);
-  border-radius: 4px;
-  min-width: 2px;
-  transition: width 0.5s ease;
+.kook-trash .kook-find-thumb img {
+  width: 100%; height: 100%; object-fit: cover; display: block;
 }
-.kook-trash .kook-month-val {
-  font-family: var(--font-mono);
-  font-size: var(--text-meta);
-  color: #444;
-  font-weight: 600;
-  white-space: nowrap;
-  min-width: 3.4em;
-  text-align: right;
+.kook-trash .kook-find-thumb:hover { outline: 2px solid var(--brand-orange); outline-offset: 1px; }
+.kook-trash .kook-find-thumb-date {
+  display: flex; align-items: center; justify-content: center;
+  width: 100%; height: 100%;
+  font-family: var(--font-mono); font-size: 9px; color: #888;
+  background: #ececec; text-decoration: none;
 }
-.kook-trash .kook-monthly-title {
-  font-family: var(--font-sans);
-  font-size: var(--text-label);
-  letter-spacing: var(--letter-label);
-  text-transform: uppercase;
-  color: #999;
-  font-weight: 600;
-  margin: 18px 0 2px 0;
+.kook-trash .kook-find-thumb-date:hover { color: var(--brand-orange); }
+@media (max-width: 600px) {
+  .kook-trash .kook-find-thumb { width: 40px; height: 40px; }
 }
 /* Pagination */
 .kook-trash .kook-pagination {
@@ -507,7 +351,10 @@
   .kook-trash .kook-log-best { grid-template-columns: repeat(3, 1fr); gap: 6px; }
   .kook-trash .kook-log-best-card { padding: 10px 6px; }
   .kook-trash .kook-log-best-val { font-size: 1em; }
-  .kook-trash .kook-month-row { grid-template-columns: 48px 1fr auto; gap: 8px; }
+  .kook-trash .kook-charts { grid-template-columns: 1fr; gap: 20px; }
+  .kook-trash .kook-chart-plot { height: 104px; gap: 4px; }
+  .kook-trash .kook-vbar-wrap { min-width: 24px; }
+  .kook-trash .kook-chart-xlabel { min-width: 24px; }
   .kook-trash .kook-spot { padding: 10px 12px; gap: 10px; }
   .kook-trash .kook-spot-photo { width: 78px; height: 78px; }
   .kook-trash .kook-feed-thumb { width: 78px; height: 78px; }
@@ -565,20 +412,35 @@
     <h2 data-lang-es="">🗑️ Basura</h2>
     <h2 data-lang-en="">🗑️ Trash</h2>
     <div class="kook-headline-stats" id="trashStats"></div>
-    <p class="kook-derived-stats" id="trashDerived"></p>
-    <div class="kook-monthly" id="trashMonthly"></div>
+    <div class="kook-charts">
+      <div class="kook-chart" id="chartBags"></div>
+      <div class="kook-chart" id="chartOutings"></div>
+    </div>
+    <p class="kook-chart-note" id="trashChartNote"></p>
 
     <!-- SATS STATS -->
     <h2 data-lang-es="">⚡ Sats</h2>
     <h2 data-lang-en="">⚡ Sats</h2>
     <div class="kook-headline-stats" id="satsStats"></div>
-    <p class="kook-derived-stats" id="satsDerived"></p>
-    <div class="kook-monthly" id="satsMonthly"></div>
+    <div class="kook-charts">
+      <div class="kook-chart" id="chartSats"></div>
+      <div class="kook-chart" id="chartZaps"></div>
+    </div>
+    <p class="kook-chart-note" id="satsChartNote"></p>
 
     <!-- RECORDS -->
     <h2 data-lang-es="">🏅 Récords</h2>
     <h2 data-lang-en="">🏅 Records</h2>
     <div class="kook-log-best" id="bestGrid"></div>
+
+    <!-- SPECIAL FINDS -->
+    <div id="specialSection" style="display:none;">
+      <h2 data-lang-es="">🔎 Hallazgos especiales</h2>
+      <h2 data-lang-en="">🔎 Special finds</h2>
+      <p data-lang-es="">Cosas que no son basura corriente. Pulsa una foto para ver la nota de esa salida.</p>
+      <p data-lang-en="">Things that aren't ordinary litter. Tap a photo to see that outing's note.</p>
+      <div class="kook-finds" id="specialList"></div>
+    </div>
 
     <!-- OUTINGS FEED -->
     <h2 data-lang-es="">📋 Salidas</h2>
@@ -626,12 +488,14 @@ const URL_ZAPPERS = "https://docs.google.com/spreadsheets/d/" + SHEET_ID + "/gvi
 const URL_SPOTS   = "https://docs.google.com/spreadsheets/d/" + SHEET_ID + "/gviz/tq?tqx=out:csv&sheet=Spots";
 
 let NOTES = [], ZAPPERS = {}, SPOTS = {};
+let ITEM_COLS = [];   // [{key,index}] — special-item columns detected in the Notes header
 let currentLang = "en";
 let pageNotas = 0;
 let activeSpotFilter = null; // null = no filter, string = spot id
 let activeSort = "newest";
 const PAGE_SIZE = 10;
 const PAGE_SIZE_TABLE = 15;
+const MONTHS_SHOWN = 12;   // rolling window for the monthly charts
 
 // ── Utility functions ──────────────────────────────────────────────────────
 function escHtml(s) {
@@ -771,6 +635,19 @@ async function loadData() {
   const rowsN = notesR.value;
   if (rowsN.length < 2) { showError(lang==="es"?"La pestaña Notes está vacía":"Notes tab is empty"); return; }
 
+  // Work out which columns hold special items: everything after "minutes",
+  // minus the excluded ones. Name-based, so column order can change freely.
+  ITEM_COLS = [];
+  const headerN = (rowsN[0] || []).map(h => String(h||"").trim().toLowerCase());
+  const minutesIdx = headerN.indexOf("minutes");
+  if (minutesIdx !== -1) {
+    for (let c = minutesIdx + 1; c < headerN.length; c++) {
+      const key = headerN[c];
+      if (!key || ITEM_EXCLUDE.indexOf(key) !== -1) continue;
+      ITEM_COLS.push({ key, index: c });
+    }
+  }
+
   ZAPPERS = {};
   if (zappersR.status==="fulfilled") {
     zappersR.value.slice(1).forEach(r => {
@@ -807,8 +684,13 @@ async function loadData() {
     const bags=parseFloat(String(r[3]).replace(",","."))||0;
     const imageUrl=String(r[4]||"").trim(), spotId=String(r[5]||"").trim(), outerId=String(r[6]||"").trim();
     const minutes=parseInt(String(r[7]||"").trim())||0;
+    const items={};
+    ITEM_COLS.forEach(col => {
+      const v = parseInt(String(r[col.index]||"").trim(), 10);
+      if (v > 0) items[col.key] = v;
+    });
     const zaps=(zapsById[id]||[]).map(z=>({npub:z.npub,sats:z.sats,zappedOuter:z.zappedOuter}));
-    NOTES.push({id,date,eventId,bags,imageUrl,spotId,outerId,minutes,zaps});
+    NOTES.push({id,date,eventId,bags,imageUrl,spotId,outerId,minutes,zaps,items});
   }
   if (NOTES.length===0) { showError(lang==="es"?"No hay notas válidas":"No valid notes"); return; }
 
@@ -826,45 +708,165 @@ function fmtDuration(mins) {
 }
 
 // Group notes by YYYY-MM, returns [{key, label, bags, sats, outings, minutes}] oldest→newest
+
+// Special-item columns: everything after "minutes" in the Notes header except
+// the ones listed here. Matched by name, so column order can change freely.
+const ITEM_EXCLUDE = ["cuida_sign"];
+const ITEM_META = {
+  chairs:                 { icon:"🪑", en:"Chairs",            es:"Sillas" },
+  fire_extinguishers:     { icon:"🧯", en:"Fire extinguishers", es:"Extintores" },
+  cosntruction_bags:      { icon:"🧱", en:"Construction bags",  es:"Sacos de obra" },
+  construction_bags:      { icon:"🧱", en:"Construction bags",  es:"Sacos de obra" },
+  car_tires:              { icon:"🛞", en:"Car tires",          es:"Neumáticos" },
+  mattresses:             { icon:"🛏️", en:"Mattresses",         es:"Colchones" },
+  nails:                  { icon:"🔩", en:"Nails",              es:"Clavos" },
+  barrels:                { icon:"🛢️", en:"Barrels",            es:"Bidones" },
+  big_liquid_containers:  { icon:"🧴", en:"Large containers",   es:"Garrafas" },
+  fishing_boxes:          { icon:"🧊", en:"Fishing boxes",      es:"Cajas de pesca" },
+  fishing_nets:           { icon:"🕸️", en:"Fishing nets",        es:"Redes de pesca" }
+};
+function itemLabel(key, lang) {
+  const m = ITEM_META[key];
+  if (m) return m[lang] || m.en;
+  // Unknown column — make the header name presentable
+  return key.replace(/_/g, " ").replace(/^./, c => c.toUpperCase());
+}
+function itemIcon(key) {
+  return (ITEM_META[key] && ITEM_META[key].icon) || "📦";
+}
+
 function monthlyBuckets(lang) {
   const buckets = {};
   NOTES.forEach(n => {
     const key = n.date.slice(0,7);
-    if (!buckets[key]) buckets[key] = { key, outings:0, bags:0, sats:0, minutes:0 };
+    if (!buckets[key]) buckets[key] = { key, outings:0, bags:0, sats:0, zaps:0, minutes:0 };
     const b = buckets[key];
     b.outings++;
     b.bags += n.bags;
     b.sats += totalSats(n);
+    b.zaps += n.zaps.length;
     b.minutes += (n.minutes||0);
   });
   const monthsEs = ["ene","feb","mar","abr","may","jun","jul","ago","sep","oct","nov","dic"];
   const monthsEn = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
   const names = lang === "es" ? monthsEs : monthsEn;
-  return Object.values(buckets)
+  // Flag the month that hasn't finished yet, so its partial total isn't read
+  // as a drop. Compared against the latest note rather than the clock, so the
+  // chart stays honest if the sheet is behind.
+  const now = new Date();
+  const currentKey = now.getFullYear() + "-" + String(now.getMonth()+1).padStart(2,"0");
+
+  const all = Object.values(buckets)
     .sort((a,b)=>a.key.localeCompare(b.key))
     .map(b => {
       const [y,m] = b.key.split("-");
       b.label = names[parseInt(m,10)-1] + " " + y.slice(-2);
+      b.partial = (b.key === currentKey);
       return b;
     });
+
+  // Beyond a year the bars get too thin to read; the container scrolls, but
+  // cap the window so the default view stays legible.
+  return all.length > MONTHS_SHOWN ? all.slice(-MONTHS_SHOWN) : all;
 }
 
 // Render a set of monthly bars into a container
-function renderMonthlyBars(containerId, title, buckets, valueFn, formatFn) {
+// Render a vertical grouped bar chart. Each series is scaled to its own max,
+// so two series of very different magnitude (sats vs zaps) stay readable; the
+// printed value above each bar keeps it honest.
+// Render one metric as a vertical bar chart. Single series only — two metrics
+// on a shared axis would invite a comparison between values of different kinds.
+// The in-progress month is hatched so a partial total doesn't read as a decline.
+// Explain the hatched bar, but only when a partial month is actually shown.
+function setChartNote(containerId, buckets, label) {
   const el = document.getElementById(containerId);
   if (!el) return;
+  el.innerHTML = buckets.some(b => b.partial)
+    ? '<span class="kook-vbar-partial" style="display:inline-block;width:18px;height:9px;border-radius:2px;vertical-align:-1px;margin-right:6px;"></span>'+label
+    : '';
+}
+
+function renderBarChart(containerId, title, buckets, valueFn, formatFn) {
+  const el = document.getElementById(containerId);
+  if (!el) return;
+  if (!buckets.length) { el.innerHTML = ""; return; }
+
   const max = Math.max(...buckets.map(valueFn), 1);
+
+  const bars = buckets.map(b => {
+    const v = valueFn(b);
+    const pct = Math.round((v / max) * 86); // headroom for the value label
+    return '<div class="kook-vbar-wrap">'+
+      '<span class="kook-vbar-val">'+formatFn(v)+'</span>'+
+      '<div class="kook-vbar'+(b.partial?' kook-vbar-partial':'')+'" style="height:'+pct+'%"></div>'+
+    '</div>';
+  }).join("");
+
+  const axis = buckets.map(b =>
+    '<span class="kook-chart-xlabel'+(b.partial?' kook-chart-xlabel-partial':'')+'">'+b.label+'</span>'
+  ).join("");
+
   el.innerHTML =
-    '<p class="kook-monthly-title">'+title+'</p>' +
-    buckets.map(b => {
-      const v = valueFn(b);
-      const pct = Math.round((v/max)*100);
-      return '<div class="kook-month-row">'+
-        '<span class="kook-month-label">'+b.label+'</span>'+
-        '<div class="kook-month-track"><div class="kook-month-bar" style="width:'+pct+'%"></div></div>'+
-        '<span class="kook-month-val">'+formatFn(v)+'</span>'+
-      '</div>';
+    '<span class="kook-chart-title">'+title+'</span>'+
+    '<div class="kook-chart-scroll"><div class="kook-chart-inner">'+
+      '<div class="kook-chart-plot">'+bars+'</div>'+
+      '<div class="kook-chart-axis">'+axis+'</div>'+
+    '</div></div>';
+}
+
+// Special finds — one row per item type, with a thumbnail per outing it
+// appeared in, each linking to that outing's Nostr note.
+function renderSpecialFinds(lang) {
+  const el = document.getElementById("specialList");
+  const section = document.getElementById("specialSection");
+  if (!el) return;
+
+  // Group: item key -> { total, notes:[{note, count}] }
+  const groups = {};
+  NOTES.forEach(n => {
+    Object.keys(n.items || {}).forEach(k => {
+      if (!groups[k]) groups[k] = { total:0, entries:[] };
+      groups[k].total += n.items[k];
+      groups[k].entries.push({ note:n, count:n.items[k] });
+    });
+  });
+
+  const keys = Object.keys(groups).sort((a,b)=>groups[b].total-groups[a].total);
+  if (section) section.style.display = keys.length ? "block" : "none";
+  if (!keys.length) { el.innerHTML = ""; return; }
+
+  const foundIn = lang==="es" ? "en" : "in";
+  const outingWord  = lang==="es" ? "salida"  : "outing";
+  const outingWordP = lang==="es" ? "salidas" : "outings";
+
+  el.innerHTML = keys.map(k => {
+    const g = groups[k];
+    // Newest outing first
+    const entries = g.entries.sort((a,b)=>{
+      const cmp = b.note.date.localeCompare(a.note.date);
+      return cmp !== 0 ? cmp : parseInt(b.note.id)-parseInt(a.note.id);
+    });
+
+    const thumbs = entries.map(e => {
+      const label = fmtFecha(e.note.date, lang) + (e.count>1 ? " ×"+e.count : "");
+      const alt = itemLabel(k, lang) + " — " + fmtFecha(e.note.date, lang);
+      const inner = e.note.imageUrl
+        ? '<img src="'+escHtml(e.note.imageUrl)+'" alt="'+escHtml(alt)+'" loading="lazy">'
+        : '<span class="kook-find-thumb-date">'+fmtFecha(e.note.date, lang)+'</span>';
+      return '<a class="kook-find-thumb" href="'+noteUrl(e.note.eventId)+'" target="_blank" rel="noopener" title="'+escHtml(label)+'">'+inner+'</a>';
     }).join("");
+
+    const nOut = entries.length;
+    return '<div class="kook-find">'+
+      '<span class="kook-find-icon">'+itemIcon(k)+'</span>'+
+      '<div class="kook-find-body">'+
+        '<div class="kook-find-name">'+escHtml(itemLabel(k, lang))+
+          ' <span class="kook-find-count">'+g.total+'</span>'+
+        '</div>'+
+        '<div class="kook-find-thumbs">'+thumbs+'</div>'+
+      '</div>'+
+    '</div>';
+  }).join("");
 }
 
 function renderStats(lang) {
@@ -879,66 +881,71 @@ function renderStats(lang) {
   const timedNotes = NOTES.filter(n=>n.minutes>0);
   const avgMinutes = timedNotes.length ? Math.round(timedNotes.reduce((s,n)=>s+n.minutes,0)/timedNotes.length) : 0;
   const buckets = monthlyBuckets(lang);
+  const dp1 = v => v.toFixed(1).replace(".", dec);
 
-  const headline = (val, label) =>
+  // KPI card: big number, label, and its supporting metric underneath.
+  const card = (val, label, sub) =>
     '<div class="kook-headline-card">'+
       '<span class="kook-headline-val">'+val+'</span>'+
       '<span class="kook-headline-label">'+label+'</span>'+
+      (sub ? '<span class="kook-headline-sub">'+sub+'</span>' : '')+
     '</div>';
 
   // ── TRASH ──
   const T = lang==="es"
     ? { outings:"Salidas", bags:"Bolsas", time:"Tiempo", spots:"Spots",
-        perOuting:"bolsas/salida", perHour:"bolsas/hora", minOuting:"min/salida",
-        monthly:"Bolsas por mes" }
+        perOuting:"por salida", minOuting:"de media", topSpot:"el más visitado",
+        mBags:"Bolsas por mes", mOutings:"Salidas por mes", partial:"mes en curso" }
     : { outings:"Outings", bags:"Bags", time:"Time", spots:"Spots",
-        perOuting:"bags/outing", perHour:"bags/hour", minOuting:"min/outing",
-        monthly:"Bags per month" };
-
-  document.getElementById("trashStats").innerHTML =
-    headline(NOTES.length, T.outings) +
-    headline(fmtBolsasNum(totalBags), T.bags) +
-    headline(fmtDuration(totalMinutes), T.time) +
-    headline(uniqueSpots, T.spots);
+        perOuting:"per outing", minOuting:"average", topSpot:"most visited",
+        mBags:"Bags per month", mOutings:"Outings per month", partial:"month in progress" };
 
   const bagsPerOuting = NOTES.length ? totalBags/NOTES.length : 0;
-  const bagsPerHour = totalHours > 0 ? totalBags/totalHours : 0;
-  document.getElementById("trashDerived").innerHTML =
-    '<strong>'+bagsPerOuting.toFixed(1).replace(".",dec)+'</strong> '+T.perOuting+' · '+
-    '<strong>'+bagsPerHour.toFixed(1).replace(".",dec)+'</strong> '+T.perHour+' · '+
-    '<strong>'+avgMinutes+'</strong> '+T.minOuting;
+  const bagsPerHour   = totalHours > 0 ? totalBags/totalHours : 0;
 
-  renderMonthlyBars("trashMonthly", T.monthly, buckets,
-    b => b.bags, v => fmtBolsasNum(v));
+  // Which spot gets the most attention — more useful than an average per spot
+  const spotCounts = {};
+  NOTES.forEach(n => { if (n.spotId) spotCounts[n.spotId] = (spotCounts[n.spotId]||0)+1; });
+  const topSpotId = Object.keys(spotCounts).sort((a,b)=>spotCounts[b]-spotCounts[a])[0];
+  const topSpotName = (topSpotId && SPOTS[topSpotId]) ? SPOTS[topSpotId].name : "—";
+
+  document.getElementById("trashStats").innerHTML =
+    card(NOTES.length,            T.outings, '<b>'+avgMinutes+' min</b> '+T.minOuting) +
+    card(fmtBolsasNum(totalBags), T.bags,    '<b>'+dp1(bagsPerOuting)+'</b> '+T.perOuting) +
+    card(fmtDuration(totalMinutes), T.time,  '<b>'+dp1(bagsPerHour)+'</b> '+T.bags.toLowerCase()+'/h') +
+    card(uniqueSpots,             T.spots,   '<b>'+escHtml(topSpotName)+'</b><br>'+T.topSpot);
+
+  renderBarChart("chartBags",    T.mBags,    buckets, b=>b.bags,    v=>fmtBolsasNum(v));
+  renderBarChart("chartOutings", T.mOutings, buckets, b=>b.outings, v=>String(v));
+  setChartNote("trashChartNote", buckets, T.partial);
 
   // ── SATS ──
   const S = lang==="es"
-    ? { sats:"Sats", zaps:"Zaps", zappers:"Zappers", perOuting:"sats/salida",
-        perBag:"sats/bolsa", perHour:"sats/hora", perZap:"sats/zap",
-        monthly:"Sats por mes" }
-    : { sats:"Sats", zaps:"Zaps", zappers:"Zappers", perOuting:"sats/outing",
-        perBag:"sats/bag", perHour:"sats/hour", perZap:"sats/zap",
-        monthly:"Sats per month" };
+    ? { sats:"Sats", zaps:"Zaps", zappers:"Zappers", zapped:"Zapeadas",
+        perOuting:"por salida", perZap:"por zap", perZapper:"por zapper",
+        ofOutings:"de las salidas", mSats:"Sats por mes", mZaps:"Zaps por mes",
+        partial:"mes en curso" }
+    : { sats:"Sats", zaps:"Zaps", zappers:"Zappers", zapped:"Zapped",
+        perOuting:"per outing", perZap:"per zap", perZapper:"per zapper",
+        ofOutings:"of outings", mSats:"Sats per month", mZaps:"Zaps per month",
+        partial:"month in progress" };
 
   const zappedOutings = NOTES.filter(n=>n.zaps.length>0).length;
-  document.getElementById("satsStats").innerHTML =
-    headline(fmtNum(totalSatsAll), S.sats) +
-    headline(totalZaps, S.zaps) +
-    headline(zappersUnicos, S.zappers) +
-    headline(zappedOutings+"/"+NOTES.length, lang==="es"?"Zapeadas":"Zapped");
-
   const satsPerOuting = NOTES.length ? totalSatsAll/NOTES.length : 0;
-  const satsPerBag = totalBags > 0 ? totalSatsAll/totalBags : 0;
-  const satsPerHour = totalHours > 0 ? totalSatsAll/totalHours : 0;
-  const satsPerZap = totalZaps > 0 ? totalSatsAll/totalZaps : 0;
-  document.getElementById("satsDerived").innerHTML =
-    '<strong>'+fmtNum(Math.round(satsPerOuting))+'</strong> '+S.perOuting+' · '+
-    '<strong>'+fmtNum(Math.round(satsPerBag))+'</strong> '+S.perBag+' · '+
-    '<strong>'+fmtNum(Math.round(satsPerHour))+'</strong> '+S.perHour+' · '+
-    '<strong>'+fmtNum(Math.round(satsPerZap))+'</strong> '+S.perZap;
+  const satsPerZap    = totalZaps > 0 ? totalSatsAll/totalZaps : 0;
+  const satsPerZapper = zappersUnicos > 0 ? totalSatsAll/zappersUnicos : 0;
+  const zappedPct     = NOTES.length ? Math.round((zappedOutings/NOTES.length)*100) : 0;
 
-  renderMonthlyBars("satsMonthly", S.monthly, buckets,
-    b => b.sats, v => fmtNum(v));
+  document.getElementById("satsStats").innerHTML =
+    card(fmtNum(totalSatsAll), S.sats,    '<b>'+fmtNum(Math.round(satsPerOuting))+'</b> '+S.perOuting) +
+    card(totalZaps,            S.zaps,    '<b>'+fmtNum(Math.round(satsPerZap))+'</b> '+S.perZap) +
+    card(zappersUnicos,        S.zappers, '<b>'+fmtNum(Math.round(satsPerZapper))+'</b> '+S.perZapper) +
+    card(zappedOutings+"/"+NOTES.length, S.zapped, '<b>'+zappedPct+'%</b> '+S.ofOutings);
+
+  renderBarChart("chartSats", S.mSats, buckets, b=>b.sats,
+    v => v>=1000 ? (v/1000).toFixed(1).replace(".",dec)+"k" : String(v));
+  renderBarChart("chartZaps", S.mZaps, buckets, b=>b.zaps, v=>String(v));
+  setChartNote("satsChartNote", buckets, S.partial);
 
   // ── RECORDS ──
   const bestSats = [...NOTES].sort((a,b)=>totalSats(b)-totalSats(a))[0];
@@ -946,8 +953,8 @@ function renderStats(lang) {
   const bestTime = [...NOTES].filter(n=>n.minutes>0).sort((a,b)=>b.minutes-a.minutes)[0] || null;
 
   const R = lang==="es"
-    ? { sats:"Más zapeada", bags:"Más bolsas", time:"Sesión más larga", view:"ver" }
-    : { sats:"Most zapped", bags:"Most bags", time:"Longest session", view:"view" };
+    ? { sats:"Más zapeada", bags:"Más bolsas", time:"Sesión más larga" }
+    : { sats:"Most zapped", bags:"Most bags", time:"Longest session" };
 
   const bestCard = (label, val, note) =>
     '<div class="kook-log-best-card">'+
@@ -1160,6 +1167,7 @@ function render(lang) {
   currentLang = lang;
   renderStats(lang);
   populateControls(lang);
+  renderSpecialFinds(lang);
   renderSpots(lang);
   renderFeed(lang);
 }
@@ -1179,16 +1187,30 @@ function setLang(lang) {
 function saveLangPreference(lang) {
   try { localStorage.setItem("sats4trash-lang", lang); } catch (e) {}
 }
+// Fall back to the browser's preferred languages when nothing is saved yet.
+function detectBrowserLang() {
+  const prefs = (navigator.languages && navigator.languages.length)
+    ? navigator.languages
+    : [navigator.language || navigator.userLanguage || "en"];
+  for (const p of prefs) {
+    const code = String(p).toLowerCase();
+    if (code.startsWith("es")) return "es";
+    if (code.startsWith("en")) return "en";
+  }
+  return "en";
+}
 function restoreLangPreference() {
   let saved = null;
   try { saved = localStorage.getItem("sats4trash-lang"); } catch (e) {}
-  if (saved !== "es" && saved !== "en") return;
-  currentLang = saved;
+  // A saved choice wins; otherwise follow the browser. Never persist the
+  // detected value, so a later browser/OS language change still takes effect.
+  const lang = (saved === "es" || saved === "en") ? saved : detectBrowserLang();
+  currentLang = lang;
   const root = document.getElementById("kookTrash");
-  if (saved === "en") root.classList.add("lang-en"); else root.classList.remove("lang-en");
-  document.documentElement.lang = saved;
-  document.getElementById("btnEs").classList.toggle("active", saved === "es");
-  document.getElementById("btnEn").classList.toggle("active", saved === "en");
+  if (lang === "en") root.classList.add("lang-en"); else root.classList.remove("lang-en");
+  document.documentElement.lang = lang;
+  document.getElementById("btnEs").classList.toggle("active", lang === "es");
+  document.getElementById("btnEn").classList.toggle("active", lang === "en");
 }
 restoreLangPreference();
 

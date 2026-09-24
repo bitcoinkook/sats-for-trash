@@ -430,16 +430,30 @@ function setLang(lang) {
 function saveLangPreference(lang) {
   try { localStorage.setItem("sats4trash-lang", lang); } catch (e) {}
 }
+// Fall back to the browser's preferred languages when nothing is saved yet.
+function detectBrowserLang() {
+  const prefs = (navigator.languages && navigator.languages.length)
+    ? navigator.languages
+    : [navigator.language || navigator.userLanguage || "en"];
+  for (const p of prefs) {
+    const code = String(p).toLowerCase();
+    if (code.startsWith("es")) return "es";
+    if (code.startsWith("en")) return "en";
+  }
+  return "en";
+}
 function restoreLangPreference() {
   let saved = null;
   try { saved = localStorage.getItem("sats4trash-lang"); } catch (e) {}
-  if (saved !== "es" && saved !== "en") return;
-  currentLang = saved;
+  // A saved choice wins; otherwise follow the browser. Never persist the
+  // detected value, so a later browser/OS language change still takes effect.
+  const lang = (saved === "es" || saved === "en") ? saved : detectBrowserLang();
+  currentLang = lang;
   const root = document.getElementById("kookTrash");
-  if (saved === "en") root.classList.add("lang-en"); else root.classList.remove("lang-en");
-  document.documentElement.lang = saved;
-  document.getElementById("btnEs").classList.toggle("active", saved === "es");
-  document.getElementById("btnEn").classList.toggle("active", saved === "en");
+  if (lang === "en") root.classList.add("lang-en"); else root.classList.remove("lang-en");
+  document.documentElement.lang = lang;
+  document.getElementById("btnEs").classList.toggle("active", lang === "es");
+  document.getElementById("btnEn").classList.toggle("active", lang === "en");
 }
 restoreLangPreference();
 
