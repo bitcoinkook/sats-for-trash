@@ -220,73 +220,212 @@
   color: #aaa;
   margin-top: 8px;
 }
-/* Special finds */
-.kook-trash .kook-finds {
-  display: flex;
-  flex-direction: column;
+/* Records */
+.kook-trash .kook-log-best {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
   gap: 8px;
   margin: 16px 0;
 }
-.kook-trash .kook-find {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  background: #f9f9f9;
-  border: 1px solid #e8e8e8;
-  border-radius: 6px;
-  padding: 10px 12px;
-}
-.kook-trash .kook-find-icon {
-  font-size: 1.5em;
-  line-height: 1;
-  flex-shrink: 0;
-  width: 1.5em;
+.kook-trash .kook-log-best-card {
+  background: #1a1a1a;
+  color: #fff;
+  border-radius: 8px;
+  padding: 12px 10px;
   text-align: center;
+}
+.kook-trash .kook-log-best-label {
+  font-family: var(--font-sans);
+  font-size: var(--text-label);
+  letter-spacing: var(--letter-label);
+  text-transform: uppercase;
+  color: #aaa;
+  font-weight: 500;
+  margin-bottom: 6px;
+  display: block;
+  line-height: 1.3;
+}
+.kook-trash .kook-log-best-val {
+  font-family: var(--font-mono);
+  font-size: 1.15em;
+  font-weight: 700;
+  color: var(--brand-orange);
+  line-height: 1.1;
+}
+.kook-trash .kook-log-best-meta {
+  font-family: var(--font-sans);
+  font-size: var(--text-meta);
+  color: #aaa;
+  margin-top: 4px;
+}
+.kook-trash .kook-log-best-meta a {
+  color: #aaa;
+  text-decoration: none;
+  border-bottom: 1px dotted #555;
+}
+.kook-trash .kook-log-best-meta a:hover { border-bottom-color: var(--brand-orange); color: var(--brand-orange); }
+/* Filter + sort controls */
+.kook-trash .kook-controls {
+  display: flex;
+  gap: 10px;
+  margin: 16px 0 14px 0;
+  flex-wrap: wrap;
+}
+.kook-trash .kook-control {
+  flex: 1;
+  min-width: 140px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.kook-trash .kook-control-label {
+  font-family: var(--font-sans);
+  font-size: var(--text-label);
+  letter-spacing: var(--letter-label);
+  text-transform: uppercase;
+  color: #999;
+  font-weight: 600;
+}
+.kook-trash .kook-control select {
+  font-family: var(--font-sans);
+  font-size: var(--text-meta);
+  color: #333;
+  padding: 8px 10px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  background: #fff;
+  cursor: pointer;
+  width: 100%;
+  appearance: none;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='2'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 8px center;
+  background-size: 16px;
+  padding-right: 30px;
+}
+.kook-trash .kook-control select:focus { outline: none; border-color: var(--brand-orange); }
+/* Special finds — same card language as Sacred Spots */
+.kook-trash .kook-finds { display: grid; grid-template-columns: 1fr; gap: 12px; margin: 16px 0; }
+.kook-trash .kook-find {
+  background: #f9f9f9; border: 1px solid #e8e8e8; border-radius: 6px;
+  padding: 12px 14px; display: flex; gap: 14px; align-items: flex-start;
+}
+.kook-trash .kook-find-photo {
+  flex-shrink: 0; width: 96px; height: 96px; border-radius: 4px;
+  overflow: hidden; background: #eee; display: block; position: relative;
+}
+.kook-trash .kook-find-photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.kook-trash .kook-find-photo:hover { outline: 2px solid var(--brand-orange); outline-offset: 1px; }
+.kook-trash .kook-find-photo-empty {
+  width: 100%; height: 100%; display: flex; align-items: center;
+  justify-content: center; font-size: 2em; opacity: 0.3;
 }
 .kook-trash .kook-find-body { flex: 1; min-width: 0; }
 .kook-trash .kook-find-name {
-  font-family: var(--font-serif);
-  font-size: var(--text-body);
-  font-weight: 600;
-  color: #111;
-  line-height: 1.2;
+  font-family: var(--font-serif); font-size: var(--text-lead);
+  font-weight: 600; color: #111; margin-bottom: 6px;
+  display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap;
 }
 .kook-trash .kook-find-count {
-  font-family: var(--font-mono);
-  font-size: var(--text-meta);
-  color: var(--brand-orange);
-  font-weight: 700;
+  font-family: var(--font-mono); font-size: var(--text-meta);
+  color: var(--brand-orange); font-weight: 700;
 }
-.kook-trash .kook-find-thumbs {
-  display: flex;
-  gap: 5px;
-  flex-wrap: wrap;
-  margin-top: 6px;
+.kook-trash .kook-find-stats {
+  display: flex; flex-wrap: wrap; gap: 4px 14px;
+  font-family: var(--font-sans); font-size: var(--text-meta);
+  color: #666; line-height: 1.5;
 }
+.kook-trash .kook-find-stat strong { font-family: var(--font-mono); color: var(--brand-orange); font-weight: 700; }
+.kook-trash .kook-find-stat a { color: #666; text-decoration: none; border-bottom: 1px dotted #ccc; }
+.kook-trash .kook-find-stat a:hover { border-bottom-color: var(--brand-orange); color: var(--brand-orange); }
+.kook-trash .kook-find-thumbs { display: flex; gap: 5px; flex-wrap: wrap; margin-top: 8px; }
 .kook-trash .kook-find-thumb {
-  display: block;
-  width: 46px;
-  height: 46px;
-  border-radius: 4px;
-  overflow: hidden;
-  background: #eee;
-  flex-shrink: 0;
-  position: relative;
+  display: block; width: 38px; height: 38px; border-radius: 3px;
+  overflow: hidden; background: #eee; flex-shrink: 0;
 }
-.kook-trash .kook-find-thumb img {
-  width: 100%; height: 100%; object-fit: cover; display: block;
-}
+.kook-trash .kook-find-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
 .kook-trash .kook-find-thumb:hover { outline: 2px solid var(--brand-orange); outline-offset: 1px; }
 .kook-trash .kook-find-thumb-date {
   display: flex; align-items: center; justify-content: center;
-  width: 100%; height: 100%;
-  font-family: var(--font-mono); font-size: 9px; color: #888;
-  background: #ececec; text-decoration: none;
+  width: 100%; height: 100%; font-family: var(--font-mono);
+  font-size: 8px; color: #888; background: #ececec; text-decoration: none;
 }
-.kook-trash .kook-find-thumb-date:hover { color: var(--brand-orange); }
 @media (max-width: 600px) {
-  .kook-trash .kook-find-thumb { width: 40px; height: 40px; }
+  .kook-trash .kook-find { padding: 10px 12px; gap: 10px; }
+  .kook-trash .kook-find-photo { width: 78px; height: 78px; }
+  .kook-trash .kook-find-thumb { width: 34px; height: 34px; }
 }
+/* Outings feed */
+.kook-trash .kook-feed { display: flex; flex-direction: column; gap: 8px; margin: 14px 0; }
+.kook-trash .kook-feed-row {
+  display: flex; gap: 12px; align-items: stretch;
+  background: #fff; border: 1px solid #eee; border-radius: 8px; padding: 10px;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+.kook-trash .kook-feed-row:hover {
+  border-color: var(--brand-orange);
+  box-shadow: 0 1px 6px rgba(247,147,26,0.12);
+}
+.kook-trash .kook-feed-thumb {
+  flex-shrink: 0; width: 96px; height: 96px; border-radius: 5px;
+  overflow: hidden; background: #f0f0f0; display: block;
+}
+.kook-trash .kook-feed-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.kook-trash .kook-feed-thumb-empty {
+  width: 100%; height: 100%; display: flex; align-items: center;
+  justify-content: center; font-size: 1.4em; opacity: 0.25;
+}
+.kook-trash .kook-feed-body {
+  flex: 1; min-width: 0; display: flex; flex-direction: column;
+  justify-content: center; gap: 3px;
+}
+.kook-trash .kook-feed-top { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+.kook-trash .kook-feed-date {
+  font-family: var(--font-mono); font-size: var(--text-meta);
+  font-weight: 700; color: var(--brand-orange); white-space: nowrap;
+}
+.kook-trash .kook-feed-spot {
+  font-family: var(--font-serif); font-size: var(--text-body);
+  font-weight: 600; color: #111; min-width: 0; word-break: break-word;
+}
+.kook-trash .kook-feed-num {
+  font-family: var(--font-mono); font-size: var(--text-label); color: #999; white-space: nowrap;
+}
+.kook-trash .kook-feed-meta {
+  font-family: var(--font-sans); font-size: var(--text-meta); color: #777;
+  display: flex; flex-wrap: wrap; gap: 4px 12px; align-items: center;
+}
+.kook-trash .kook-feed-meta strong { font-family: var(--font-mono); color: #444; font-weight: 600; }
+.kook-trash .kook-feed-sats {
+  font-family: var(--font-mono); font-size: var(--text-meta);
+  font-weight: 700; color: var(--brand-orange); white-space: nowrap;
+}
+.kook-trash .kook-feed-zapline { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; margin-top: 1px; }
+.kook-trash .kook-feed-avatars { display: flex; align-items: center; }
+.kook-trash .kook-feed-avatars > * { margin-right: -6px; border: 1.5px solid #fff; border-radius: 50%; }
+.kook-trash .kook-feed-avatars > *:last-child { margin-right: 0; }
+.kook-trash .kook-feed-nozap {
+  font-family: var(--font-sans); font-size: var(--text-meta); color: #bbb; font-style: italic;
+}
+.kook-trash .kook-feed-zapcta {
+  font-family: var(--font-sans); font-size: var(--text-label); font-weight: 600;
+  color: var(--brand-orange); text-decoration: none;
+  border-bottom: 1px dotted var(--brand-orange); white-space: nowrap;
+}
+.kook-trash .kook-feed-zapcta:hover { border-bottom-style: solid; }
+.kook-trash .kook-feed-link {
+  flex-shrink: 0; display: flex; align-items: center; padding-left: 4px;
+  font-family: var(--font-sans); font-size: 1.1em; color: #ccc; text-decoration: none;
+}
+.kook-trash .kook-feed-link:hover { color: var(--brand-orange); }
+.kook-trash .kook-feed-summary {
+  font-family: var(--font-sans); font-size: var(--text-meta); color: #888;
+  margin: 10px 0 0 0; padding: 8px 12px; background: #fafafa;
+  border-radius: 5px; text-align: center;
+}
+.kook-trash .kook-feed-summary strong { font-family: var(--font-mono); color: #444; font-weight: 700; }
+/* Zapper avatars inside the feed */
+.kook-trash .kook-avatar, .kook-trash .kook-avatar-fallback { display: inline-block; }
 /* Pagination */
 .kook-trash .kook-pagination {
   display: flex; justify-content: center; align-items: center;
@@ -821,13 +960,16 @@ function renderSpecialFinds(lang) {
   const section = document.getElementById("specialSection");
   if (!el) return;
 
-  // Group: item key -> { total, notes:[{note, count}] }
+  // Group by item type, tracking the outings each one appeared in
   const groups = {};
   NOTES.forEach(n => {
     Object.keys(n.items || {}).forEach(k => {
-      if (!groups[k]) groups[k] = { total:0, entries:[] };
-      groups[k].total += n.items[k];
-      groups[k].entries.push({ note:n, count:n.items[k] });
+      if (!groups[k]) groups[k] = { total:0, entries:[], sats:0, zaps:0 };
+      const g = groups[k];
+      g.total += n.items[k];
+      g.sats  += totalSats(n);
+      g.zaps  += n.zaps.length;
+      g.entries.push({ note:n, count:n.items[k] });
     });
   });
 
@@ -835,35 +977,52 @@ function renderSpecialFinds(lang) {
   if (section) section.style.display = keys.length ? "block" : "none";
   if (!keys.length) { el.innerHTML = ""; return; }
 
-  const foundIn = lang==="es" ? "en" : "in";
-  const outingWord  = lang==="es" ? "salida"  : "outing";
-  const outingWordP = lang==="es" ? "salidas" : "outings";
+  const L = lang==="es"
+    ? { outing:"salida", outings:"salidas", sats:"sats", last:"último hallazgo", spots:"spot", spotsP:"spots" }
+    : { outing:"outing", outings:"outings", sats:"sats", last:"last found", spots:"spot", spotsP:"spots" };
 
   el.innerHTML = keys.map(k => {
     const g = groups[k];
-    // Newest outing first
+    // Newest first
     const entries = g.entries.sort((a,b)=>{
       const cmp = b.note.date.localeCompare(a.note.date);
       return cmp !== 0 ? cmp : parseInt(b.note.id)-parseInt(a.note.id);
     });
+    const latest = entries[0];
+    const nOutings = entries.length;
+    const nSpots = new Set(entries.map(e=>e.note.spotId).filter(Boolean)).size;
 
-    const thumbs = entries.map(e => {
-      const label = fmtFecha(e.note.date, lang) + (e.count>1 ? " ×"+e.count : "");
-      const alt = itemLabel(k, lang) + " — " + fmtFecha(e.note.date, lang);
+    // Lead photo: the most recent outing this item was found in
+    const alt = itemLabel(k, lang) + " — " + fmtFecha(latest.note.date, lang);
+    const photo = latest.note.imageUrl
+      ? '<a class="kook-find-photo" href="'+noteUrl(latest.note.eventId)+'" target="_blank" rel="noopener">'+
+          '<img src="'+escHtml(latest.note.imageUrl)+'" alt="'+escHtml(alt)+'" loading="lazy"></a>'
+      : '<div class="kook-find-photo"><div class="kook-find-photo-empty">'+itemIcon(k)+'</div></div>';
+
+    // Remaining outings as small thumbnails
+    const rest = entries.slice(1);
+    const thumbs = rest.length ? '<div class="kook-find-thumbs">'+rest.map(e => {
+      const t = fmtFecha(e.note.date, lang) + (e.count>1 ? " ×"+e.count : "");
       const inner = e.note.imageUrl
-        ? '<img src="'+escHtml(e.note.imageUrl)+'" alt="'+escHtml(alt)+'" loading="lazy">'
+        ? '<img src="'+escHtml(e.note.imageUrl)+'" alt="'+escHtml(t)+'" loading="lazy">'
         : '<span class="kook-find-thumb-date">'+fmtFecha(e.note.date, lang)+'</span>';
-      return '<a class="kook-find-thumb" href="'+noteUrl(e.note.eventId)+'" target="_blank" rel="noopener" title="'+escHtml(label)+'">'+inner+'</a>';
-    }).join("");
+      return '<a class="kook-find-thumb" href="'+noteUrl(e.note.eventId)+'" target="_blank" rel="noopener" title="'+escHtml(t)+'">'+inner+'</a>';
+    }).join("")+'</div>' : '';
 
-    const nOut = entries.length;
     return '<div class="kook-find">'+
-      '<span class="kook-find-icon">'+itemIcon(k)+'</span>'+
+      photo+
       '<div class="kook-find-body">'+
-        '<div class="kook-find-name">'+escHtml(itemLabel(k, lang))+
-          ' <span class="kook-find-count">'+g.total+'</span>'+
+        '<div class="kook-find-name">'+
+          itemIcon(k)+' '+escHtml(itemLabel(k, lang))+
+          '<span class="kook-find-count">×'+g.total+'</span>'+
         '</div>'+
-        '<div class="kook-find-thumbs">'+thumbs+'</div>'+
+        '<div class="kook-find-stats">'+
+          '<span class="kook-find-stat"><strong>'+nOutings+'</strong> '+(nOutings===1?L.outing:L.outings)+'</span>'+
+          (nSpots ? '<span class="kook-find-stat"><strong>'+nSpots+'</strong> '+(nSpots===1?L.spots:L.spotsP)+'</span>' : '')+
+          '<span class="kook-find-stat">⚡ <strong>'+fmtNum(g.sats)+'</strong> '+L.sats+'</span>'+
+          '<span class="kook-find-stat">'+L.last+': <a href="'+noteUrl(latest.note.eventId)+'" target="_blank" rel="noopener">'+fmtFecha(latest.note.date, lang)+'</a></span>'+
+        '</div>'+
+        thumbs+
       '</div>'+
     '</div>';
   }).join("");
