@@ -296,8 +296,8 @@ html, body {
   margin-top: 2px;
   white-space: nowrap;
 }
-/* Mini podiums — Zapper ranking. Deliberately smaller than the main podium
-   above, so they read as the two raw components of the combined score. */
+/* Top zappers — two side-by-side podiums (most sats / most zaps). Cards are
+   compact because two podiums share the row. */
 .kook-trash .kook-duo {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -967,7 +967,18 @@ html, body {
     <h2 data-lang-en="">⚡ Top zappers</h2>
     <p data-lang-es="">Las personas que apoyan el proyecto económicamente. Los sats son lo que envían; los puntos suben cuanto más a menudo zapean.</p>
     <p data-lang-en="">The people supporting the project economically. Sats are what they send; points climb the more often they zap.</p>
-    <div class="kook-podium" id="podium"></div>
+    <div class="kook-duo">
+      <div>
+        <div class="kook-duo-title" data-lang-es="">⚡ Más sats</div>
+        <div class="kook-duo-title" data-lang-en="">⚡ Most sats</div>
+        <div class="kook-podium-mini" id="podiumSats"></div>
+      </div>
+      <div>
+        <div class="kook-duo-title" data-lang-es="">🔁 Más zaps</div>
+        <div class="kook-duo-title" data-lang-en="">🔁 Most zaps</div>
+        <div class="kook-podium-mini" id="podiumZaps"></div>
+      </div>
+    </div>
 
     <div id="outersSection" style="display:none;">
     <h2 data-lang-es="">🧹 Top Colaboradores</h2>
@@ -1060,18 +1071,6 @@ html, body {
       <span class="kook-section-label" data-lang-en="">⚡ Combined score · Sats + Loyalty</span>
       <p data-lang-es="" class="kook-section-desc">Sats enviados, más un bonus de fidelidad (factor 0,21) que crece con cada salida distinta zapeada.</p>
       <p data-lang-en="" class="kook-section-desc">Sats sent, plus a loyalty bonus (factor 0.21) that grows with each distinct outing zapped.</p>
-      <div class="kook-duo">
-        <div>
-          <div class="kook-duo-title" data-lang-es="">⚡ Más sats</div>
-          <div class="kook-duo-title" data-lang-en="">⚡ Most sats</div>
-          <div class="kook-podium-mini" id="podiumSats"></div>
-        </div>
-        <div>
-          <div class="kook-duo-title" data-lang-es="">🔁 Más zaps</div>
-          <div class="kook-duo-title" data-lang-en="">🔁 Most zaps</div>
-          <div class="kook-podium-mini" id="podiumZaps"></div>
-        </div>
-      </div>
       <ol id="rankingList"></ol>
     </div>
     <div class="kook-pagination" id="paginationRankingSats"></div>
@@ -1874,18 +1873,6 @@ function renderRankings(lang, fullRanking) {
 
  renderPagination("paginationRankingSats",pageRankSats,combinado.length,"prevRankSats","nextRankSats",lang);
 
-  // The two raw components behind the combined score above.
-  // Sorted copies — never sort `combinado` in place, the list above depends on its order.
-  const zapUnit  = lang==="es"?"zap":"zap";
-  const zapUnitP = lang==="es"?"zaps":"zaps";
-  const bySats = combinado.slice().sort(function(a,b){ return b.sats-a.sats || b.nZaps-a.nZaps; });
-  const byZaps = combinado.slice().sort(function(a,b){ return b.nZaps-a.nZaps || b.sats-a.sats; });
-  renderMiniPodium("podiumSats", bySats,
-    function(e){ return fmtNum(e.sats)+' \u26A1'; },
-    function(e){ return e.nZaps+' '+(e.nZaps===1?zapUnit:zapUnitP); });
-  renderMiniPodium("podiumZaps", byZaps,
-    function(e){ return e.nZaps+' \uD83D\uDD01'; },
-    function(e){ return fmtNum(e.sats)+' \u26A1'; });
 }
 
 function render(lang) {
@@ -1903,29 +1890,17 @@ function render(lang) {
   document.getElementById("statLiters").innerHTML=fmtBolsasNum(totalBags)+'<span class="kook-stat-emoji">💰</span>';
   document.getElementById("statSats").innerHTML=fmtNum(totalSatsAll)+'<span class="kook-stat-emoji">⚡</span>';
 
-  // Top zappers podium (top 3 by points)
-  const sortedTop3=fullRanking.slice(0,3);  // gold, silver, bronze by ranking
-  // Visual order on podium: silver (left), gold (center), bronze (right)
-  // Map: sortedTop3[1] = silver, sortedTop3[0] = gold, sortedTop3[2] = bronze
-  const visualOrder = [
-    sortedTop3[1] ? {data: sortedTop3[1], medal: "🥈", rank: 2} : null,
-    sortedTop3[0] ? {data: sortedTop3[0], medal: "🥇", rank: 1} : null,
-    sortedTop3[2] ? {data: sortedTop3[2], medal: "🥉", rank: 3} : null,
-  ].filter(x => x !== null);
-  const zapWord="zap", zapsWord="zaps";  // same in both languages
-  document.getElementById("podium").innerHTML=
-    visualOrder.map((entry)=>{
-      const e = entry.data;
-      const heightClass = entry.rank===1 ? "kook-podium-card-gold" : entry.rank===2 ? "kook-podium-card-silver" : "kook-podium-card-bronze";
-      return '<div class="kook-podium-card '+heightClass+'">'+
-        '<div class="kook-podium-medal">'+entry.medal+'</div>'+
-        '<div class="kook-podium-avatar">'+zapperAvatar(e.npub,72)+'</div>'+
-        '<div class="kook-podium-name">'+zapperLink(e.npub)+'</div>'+
-        '<div class="kook-podium-sats">'+fmtNum(e.puntos)+' ⭐</div>'+
-        '<div class="kook-podium-zaps">'+fmtNum(e.sats)+' ⚡</div>'+
-        '<div class="kook-podium-line3">'+e.nZaps+' '+(e.nZaps===1?zapWord:zapsWord)+'</div>'+
-      '</div>';
-    }).join("");
+  // Top zappers: two podiums — most sats, and most zaps.
+  // Sorted copies; never sort fullRanking in place, the ranking list depends on its order.
+  const zapUnit="zap", zapsUnit="zaps";  // same in both languages
+  const bySats = fullRanking.slice().sort(function(a,b){ return b.sats-a.sats || b.nZaps-a.nZaps; });
+  const byZaps = fullRanking.slice().sort(function(a,b){ return b.nZaps-a.nZaps || b.sats-a.sats; });
+  renderMiniPodium("podiumSats", bySats,
+    function(e){ return fmtNum(e.sats)+' \u26A1'; },
+    function(e){ return e.nZaps+' '+(e.nZaps===1?zapUnit:zapsUnit); });
+  renderMiniPodium("podiumZaps", byZaps,
+    function(e){ return e.nZaps+' \uD83D\uDD01'; },
+    function(e){ return fmtNum(e.sats)+' \u26A1'; });
 
   const strike=calcStrike(NOTES);
   const potential=calcStrikePotential(NOTES,strike.max);
