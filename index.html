@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="light">
 <title>Sats 4 Trash</title>
 <meta name="description" content="Picking up trash from neglected natural spaces, paid in sats via Nostr.">
 <meta property="og:title" content="Sats for Trash">
@@ -19,6 +20,15 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
+/* Force light rendering. Some in-app browsers (X/Twitter, Facebook) apply an
+   auto-dark filter to pages that don't declare a scheme. Because the page sets
+   explicit dark text but inherited backgrounds, that produced dark-on-dark.
+   Declaring the scheme and an explicit background opts the page out. */
+:root { color-scheme: light; }
+html, body {
+  background: #ffffff;
+  color: #222;
+}
 .kook-trash {
   --font-serif: 'Crimson Pro', Georgia, 'Times New Roman', serif;
   --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
@@ -286,6 +296,42 @@
   margin-top: 2px;
   white-space: nowrap;
 }
+/* Mini podiums — Zapper ranking. Deliberately smaller than the main podium
+   above, so they read as the two raw components of the combined score. */
+.kook-trash .kook-duo {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+  margin: 18px 0 26px 0;
+}
+.kook-trash .kook-duo-title {
+  font-family: var(--font-sans);
+  font-size: var(--text-label);
+  letter-spacing: var(--letter-label);
+  text-transform: uppercase;
+  font-weight: 600;
+  color: #666;
+  margin-bottom: 8px;
+  text-align: center;
+}
+.kook-trash .kook-podium-mini {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 5px;
+  align-items: end;
+}
+.kook-trash .kook-podium-mini .kook-podium-card { padding: 12px 5px 10px 5px; border-radius: 8px; }
+.kook-trash .kook-podium-mini .kook-podium-card-gold { padding-top: 16px; padding-bottom: 14px; }
+.kook-trash .kook-podium-mini .kook-podium-card-silver { padding-top: 12px; padding-bottom: 10px; }
+.kook-trash .kook-podium-mini .kook-podium-card-bronze { padding-top: 8px; padding-bottom: 8px; }
+.kook-trash .kook-podium-mini .kook-podium-medal { font-size: 1.1em; margin-bottom: 6px; }
+.kook-trash .kook-podium-mini .kook-podium-card-gold .kook-podium-medal { font-size: 1.3em; }
+.kook-trash .kook-podium-mini .kook-podium-card-silver .kook-podium-medal { font-size: 1.15em; }
+.kook-trash .kook-podium-mini .kook-podium-card-bronze .kook-podium-medal { font-size: 1em; }
+.kook-trash .kook-podium-mini .kook-podium-avatar { margin-bottom: 7px; }
+.kook-trash .kook-podium-mini .kook-podium-name { font-size: 12px; margin-bottom: 5px; }
+.kook-trash .kook-podium-mini .kook-podium-sats { font-size: 1em; margin-bottom: 2px; }
+.kook-trash .kook-podium-mini .kook-podium-line3 { font-size: 0.65em; }
 .kook-trash .kook-stat-card {
   background: #1a1a1a;
   color: #fff;
@@ -689,6 +735,7 @@
   }
   .kook-trash table.kook-data thead th,
   .kook-trash table.kook-data tbody td { padding: 6px 5px; }
+  .kook-trash .kook-duo { grid-template-columns: 1fr; gap: 22px; }
   .kook-trash .kook-podium { gap: 4px; }
   .kook-trash .kook-podium-card { padding-left: 6px; padding-right: 6px; }
   .kook-trash .kook-podium-name { font-size: 0.85em; }
@@ -1013,6 +1060,18 @@
       <span class="kook-section-label" data-lang-en="">⚡ Combined score · Sats + Loyalty</span>
       <p data-lang-es="" class="kook-section-desc">Sats enviados, más un bonus de fidelidad (factor 0,21) que crece con cada salida distinta zapeada.</p>
       <p data-lang-en="" class="kook-section-desc">Sats sent, plus a loyalty bonus (factor 0.21) that grows with each distinct outing zapped.</p>
+      <div class="kook-duo">
+        <div>
+          <div class="kook-duo-title" data-lang-es="">⚡ Más sats</div>
+          <div class="kook-duo-title" data-lang-en="">⚡ Most sats</div>
+          <div class="kook-podium-mini" id="podiumSats"></div>
+        </div>
+        <div>
+          <div class="kook-duo-title" data-lang-es="">🔁 Más zaps</div>
+          <div class="kook-duo-title" data-lang-en="">🔁 Most zaps</div>
+          <div class="kook-podium-mini" id="podiumZaps"></div>
+        </div>
+      </div>
       <ol id="rankingList"></ol>
     </div>
     <div class="kook-pagination" id="paginationRankingSats"></div>
@@ -1090,7 +1149,10 @@ const HITOS = {
   salidas: [21,69,210,420,690,999],
   bags:  [21,69,210,420,690,999],
   sats:    [21000,69000,210000,420000,690000,999999],
-  zappers: [21,69,210,420,690,999]
+  zappers: [21,69,210,420,690,999],
+  hours:   [21,69,210,420,690,999],
+  // Litres = bags x 10, so the bag pattern scaled by 10 keeps both bars in step.
+  liters:  [210,690,2100,4200,6900,9990]
 };
 const LOYALTY_FACTOR = 0.21;     // multiplier on log(distinctOutings) for points calc
 
@@ -1307,6 +1369,14 @@ function fmtCompact(n, lang) {
 // locale handling needed since the output is just digits.
 function fmtBolsasNum(n) {
   return String(Math.round(n));
+}
+// Whole hours. Milestone bars track hours, not minutes, so the target stays legible.
+function fmtHoras(n) {
+  return String(Math.round(n)) + "h";
+}
+// Litres, thousands-separated, with unit.
+function fmtLitros(n, lang) {
+  return fmtNum(Math.round(n), lang) + " L";
 }
 // Always 2 decimals, locale-aware. Used in the outings log table and latest-outing summary.
 function fmtBolsas2(n, lang) {
@@ -1750,6 +1820,33 @@ function prevGallery(){if(pageGallery>0){pageGallery--;renderGallery(currentLang
 function nextGallery(){pageGallery++;renderGallery(currentLang);scrollToAnchor("galleryAnchor");}
 
 
+// Renders a compact 3-card podium into `id`, ordered silver-gold-bronze so the
+// winner sits in the middle. `entries` must already be sorted best-first.
+// mainFn/subFn return the big line and the small line for each card.
+function renderMiniPodium(id, entries, mainFn, subFn) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  const top3 = entries.slice(0, 3);
+  const visual = [
+    top3[1] ? {data: top3[1], medal: "\uD83E\uDD48", rank: 2} : null,
+    top3[0] ? {data: top3[0], medal: "\uD83E\uDD47", rank: 1} : null,
+    top3[2] ? {data: top3[2], medal: "\uD83E\uDD49", rank: 3} : null
+  ].filter(function(x){ return x !== null; });
+  el.innerHTML = visual.map(function(entry){
+    const e = entry.data;
+    const heightClass = entry.rank===1 ? "kook-podium-card-gold"
+                      : entry.rank===2 ? "kook-podium-card-silver"
+                      : "kook-podium-card-bronze";
+    return '<div class="kook-podium-card '+heightClass+'">'+
+      '<div class="kook-podium-medal">'+entry.medal+'</div>'+
+      '<div class="kook-podium-avatar">'+zapperAvatar(e.npub,44)+'</div>'+
+      '<div class="kook-podium-name">'+zapperLink(e.npub)+'</div>'+
+      '<div class="kook-podium-sats">'+mainFn(e)+'</div>'+
+      '<div class="kook-podium-line3">'+subFn(e)+'</div>'+
+    '</div>';
+  }).join("");
+}
+
 function renderRankings(lang, fullRanking) {
   const combinado=fullRanking || computeRanking();
   const zapLabel  = lang==="es"?"zap enviado":"zap sent";
@@ -1763,25 +1860,41 @@ function renderRankings(lang, fullRanking) {
         const prefix=pos<=3
           ? '<span class="kook-rank-medal">'+medals[pos-1]+'</span>'
           : '<span class="kook-rank-num">'+pos+'.</span>';
-        const detalle = fmtNum(e.sats)+" sats · "+e.nZaps+" "+(e.nZaps===1?zapLabel:zapLabelP);
+        const detalle = fmtNum(e.sats)+" ⚡ sats · "+e.nZaps+" "+(e.nZaps===1?zapLabel:zapLabelP);
         return '<li class="kook-rank-entry">'+
           prefix+
           zapperAvatar(e.npub,32)+
           '<div class="kook-rank-body">'+
             '<div><strong class="kook-rank-name">'+zapperLink(e.npub)+'</strong>'+
-            ' <span class="kook-rank-points">· '+fmtNum(e.puntos)+' '+ptsLabel+'</span></div>'+
+            ' <span class="kook-rank-points">· '+fmtNum(e.puntos)+' ⭐ '+ptsLabel+'</span></div>'+
             '<div class="kook-rank-detail">'+detalle+'</div>'+
           '</div>'+
         '</li>';
       }).join("");
 
  renderPagination("paginationRankingSats",pageRankSats,combinado.length,"prevRankSats","nextRankSats",lang);
+
+  // The two raw components behind the combined score above.
+  // Sorted copies — never sort `combinado` in place, the list above depends on its order.
+  const zapUnit  = lang==="es"?"zap":"zap";
+  const zapUnitP = lang==="es"?"zaps":"zaps";
+  const bySats = combinado.slice().sort(function(a,b){ return b.sats-a.sats || b.nZaps-a.nZaps; });
+  const byZaps = combinado.slice().sort(function(a,b){ return b.nZaps-a.nZaps || b.sats-a.sats; });
+  renderMiniPodium("podiumSats", bySats,
+    function(e){ return fmtNum(e.sats)+' \u26A1'; },
+    function(e){ return e.nZaps+' '+(e.nZaps===1?zapUnit:zapUnitP); });
+  renderMiniPodium("podiumZaps", byZaps,
+    function(e){ return e.nZaps+' \uD83D\uDD01'; },
+    function(e){ return fmtNum(e.sats)+' \u26A1'; });
 }
 
 function render(lang) {
   if (NOTES.length===0) return;
   currentLang=lang;
   const totalBags=NOTES.reduce((s,n)=>s+n.bags,0);
+  const totalMinutes=NOTES.reduce((s,n)=>s+(n.minutes||0),0);
+  const totalHours=totalMinutes/60;
+  const totalLiters=totalBags*10;   // 1 bag = 10 litres
   const totalSatsAll=NOTES.reduce((s,n)=>s+totalSats(n),0);
   const fullRanking=computeRanking();
   const zappersUnicos=fullRanking.length;
@@ -1865,7 +1978,9 @@ function render(lang) {
     renderMilestone("🌅","Salidas","Outings",NOTES.length,HITOS.salidas,fmtNum,lang)+
     renderMilestone("⚡","Sats recibidos","Sats received",totalSatsAll,HITOS.sats,function(v){return fmtCompact(v,lang);},lang)+
     renderMilestone("👤","Zappers únicos","Unique zappers",zappersUnicos,HITOS.zappers,fmtNum,lang)+
-    renderMilestone("💰","Bolsas de basura","Bags of trash",totalBags,HITOS.bags,function(v){return fmtBolsasNum(v);},lang);
+    renderMilestone("💰","Bolsas de basura","Bags of trash",totalBags,HITOS.bags,function(v){return fmtBolsasNum(v);},lang)+
+    renderMilestone("🪣","Litros de basura","Litres of trash",totalLiters,HITOS.liters,function(v){return fmtLitros(v,lang);},lang)+
+    renderMilestone("⏱️","Tiempo limpiando","Time cleaning",totalHours,HITOS.hours,function(v){return fmtHoras(v);},lang);
   document.getElementById("streaks").innerHTML=zapStreakBlock;
 
   const ordenadas=[...NOTES].sort((a,b)=>{
