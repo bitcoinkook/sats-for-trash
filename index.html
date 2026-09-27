@@ -965,8 +965,8 @@ html, body {
 
     <h2 data-lang-es="">⚡ Top zappers</h2>
     <h2 data-lang-en="">⚡ Top zappers</h2>
-    <p data-lang-es="">Las personas que apoyan el proyecto económicamente. Los sats son lo que envían; los puntos suben cuanto más a menudo zapean.</p>
-    <p data-lang-en="">The people supporting the project economically. Sats are what they send; points climb the more often they zap.</p>
+    <p data-lang-es="">Las personas que apoyan el proyecto económicamente. Los sats ⚡ son lo que envían; los puntos ⭐ suben cuanto más a menudo zapean.</p>
+    <p data-lang-en="">The people supporting the project economically. Sats ⚡ are what they send; points ⭐ climb the more often they zap.</p>
     <div class="kook-duo">
       <div>
         <div class="kook-duo-title" data-lang-es="">⚡ Más sats</div>
@@ -1822,7 +1822,7 @@ function nextGallery(){pageGallery++;renderGallery(currentLang);scrollToAnchor("
 // Renders a compact 3-card podium into `id`, ordered silver-gold-bronze so the
 // winner sits in the middle. `entries` must already be sorted best-first.
 // mainFn/subFn return the big line and the small line for each card.
-function renderMiniPodium(id, entries, mainFn, subFn) {
+function renderMiniPodium(id, entries, mainFn, midFn, subFn) {
   const el = document.getElementById(id);
   if (!el) return;
   const top3 = entries.slice(0, 3);
@@ -1841,6 +1841,7 @@ function renderMiniPodium(id, entries, mainFn, subFn) {
       '<div class="kook-podium-avatar">'+zapperAvatar(e.npub,44)+'</div>'+
       '<div class="kook-podium-name">'+zapperLink(e.npub)+'</div>'+
       '<div class="kook-podium-sats">'+mainFn(e)+'</div>'+
+      '<div class="kook-podium-zaps">'+midFn(e)+'</div>'+
       '<div class="kook-podium-line3">'+subFn(e)+'</div>'+
     '</div>';
   }).join("");
@@ -1897,10 +1898,12 @@ function render(lang) {
   const byZaps = fullRanking.slice().sort(function(a,b){ return b.nZaps-a.nZaps || b.sats-a.sats; });
   renderMiniPodium("podiumSats", bySats,
     function(e){ return fmtNum(e.sats)+' \u26A1'; },
+    function(e){ return fmtNum(e.puntos)+' \u2B50'; },
     function(e){ return e.nZaps+' '+(e.nZaps===1?zapUnit:zapsUnit); });
   renderMiniPodium("podiumZaps", byZaps,
     function(e){ return e.nZaps+' \uD83D\uDD01'; },
-    function(e){ return fmtNum(e.sats)+' \u26A1'; });
+    function(e){ return fmtNum(e.sats)+' \u26A1'; },
+    function(e){ return fmtNum(e.puntos)+' \u2B50'; });
 
   const strike=calcStrike(NOTES);
   const potential=calcStrikePotential(NOTES,strike.max);
