@@ -582,6 +582,10 @@ html, body {
       <div class="kook-chart" id="chartSats"></div>
       <div class="kook-chart" id="chartZaps"></div>
     </div>
+    <div class="kook-charts">
+      <div class="kook-chart" id="chartSatsByZap"></div>
+      <div class="kook-chart" id="chartZapsByZap"></div>
+    </div>
     <p class="kook-chart-note" id="satsChartNote"></p>
 
     <!-- RECORDS -->
@@ -819,8 +823,9 @@ async function loadData() {
       const id=String(r[0]).trim(), npub=String(r[1]).trim();
       const sats=parseInt(String(r[2]).replace(/[^\d-]/g,""),10)||0;
       const zappedOuter=String(r[4]||"").trim();
+      const zapDate=r[3] ? normalizaFecha(r[3]) : "";
       if (!zapsById[id]) zapsById[id]=[];
-      zapsById[id].push({npub,sats,zappedOuter});
+      zapsById[id].push({npub,sats,zappedOuter,zapDate});
     });
   } else showWarning(lang==="es" ? "⚠ No se pudo cargar Zaps." : "⚠ Could not load Zaps tab.");
 
@@ -845,7 +850,9 @@ async function loadData() {
       const v = parseInt(String(r[col.index]||"").trim(), 10);
       if (v > 0) items[col.key] = v;
     });
-    const zaps=(zapsById[id]||[]).map(z=>({npub:z.npub,sats:z.sats,zappedOuter:z.zappedOuter}));
+    // No zap_date means the zap arrived the day the note was posted (or the
+    // next), so the note date stands in for it.
+    const zaps=(zapsById[id]||[]).map(z=>({npub:z.npub,sats:z.sats,zappedOuter:z.zappedOuter,date:/^\d{4}-\d{2}-\d{2}$/.test(z.zapDate)?z.zapDate:date}));
     NOTES.push({id,date,eventId,bags,imageUrl,spotId,outerId,minutes,zaps,items});
   }
   if (NOTES.length===0) { showError(lang==="es"?"No hay notas válidas":"No valid notes"); return; }
@@ -891,9 +898,18 @@ function itemIcon(key) {
   return (ITEM_META[key] && ITEM_META[key].icon) || "📦";
 }
 
-function monthlyBuckets(lang) {
+// byZapDate=false: everything bucketed by the month the note was posted.
+// byZapDate=true: sats and zaps bucketed by the month each zap arrived.
+function monthlyBuckets(lang, byZapDate) {
   const buckets = {};
-  NOTES.forEach(n => {
+  const bucket = key => buckets[key] || (buckets[key] = { key, outings:0, bags:0, sats:0, zaps:0, minutes:0 });
+  if (byZapDate) {
+    NOTES.forEach(n => n.zaps.forEach(z => {
+      const b = bucket(z.date.slice(0,7));
+      b.sats += z.sats;
+      b.zaps++;
+    }));
+  } else NOTES.forEach(n => {
     const key = n.date.slice(0,7);
     if (!buckets[key]) buckets[key] = { key, outings:0, bags:0, sats:0, zaps:0, minutes:0 };
     const b = buckets[key];
@@ -1099,11 +1115,15 @@ function renderStats(lang) {
   const S = lang==="es"
     ? { sats:"Sats", zaps:"Zaps", zappers:"Zappers", zapped:"Zapeadas",
         perOuting:"por salida", perZap:"por zap", perZapper:"por zapper",
-        ofOutings:"de las salidas", mSats:"Sats por mes", mZaps:"Zaps por mes",
+        ofOutings:"de las salidas",
+        mSats:"Sats por mes (fecha de publicación)", mZaps:"Zaps por mes (fecha de publicación)",
+        mSatsZ:"Sats por mes (fecha del zap)", mZapsZ:"Zaps por mes (fecha del zap)",
         partial:"mes en curso" }
     : { sats:"Sats", zaps:"Zaps", zappers:"Zappers", zapped:"Zapped",
         perOuting:"per outing", perZap:"per zap", perZapper:"per zapper",
-        ofOutings:"of outings", mSats:"Sats per month", mZaps:"Zaps per month",
+        ofOutings:"of outings",
+        mSats:"Sats per month (post date)", mZaps:"Zaps per month (post date)",
+        mSatsZ:"Sats per month (zap date)", mZapsZ:"Zaps per month (zap date)",
         partial:"month in progress" };
 
   const zappedOutings = NOTES.filter(n=>n.zaps.length>0).length;
@@ -1121,7 +1141,11 @@ function renderStats(lang) {
   renderBarChart("chartSats", S.mSats, buckets, b=>b.sats,
     v => v>=1000 ? (v/1000).toFixed(1).replace(".",dec)+"k" : String(v));
   renderBarChart("chartZaps", S.mZaps, buckets, b=>b.zaps, v=>String(v));
-  setChartNote("satsChartNote", buckets, S.partial);
+  const zapBuckets = monthlyBuckets(lang, true);
+  renderBarChart("chartSatsByZap", S.mSatsZ, zapBuckets, b=>b.sats,
+    v => v>=1000 ? (v/1000).toFixed(1).replace(".",dec)+"k" : String(v));
+  renderBarChart("chartZapsByZap", S.mZapsZ, zapBuckets, b=>b.zaps, v=>String(v));
+  setChartNote("satsChartNote", buckets.concat(zapBuckets), S.partial);
 
   // ── RECORDS ──
   const bestSats = [...NOTES].sort((a,b)=>totalSats(b)-totalSats(a))[0];

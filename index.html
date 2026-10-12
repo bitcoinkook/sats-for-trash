@@ -1103,7 +1103,7 @@ html, body {
         </tr></thead>
         <tbody id="dataBody"></tbody>
         <tfoot><tr>
-          <td><span data-lang-es="">TOTAL</span><span data-lang-en="">TOTAL</span><span class="kook-outing-id" id="footNotes">—</span></td>
+          <td><span data-lang-es="">TOTAL</span><span data-lang-en="">TOTAL</span></td>
           <td class="kook-num" id="footBags">—</td>
           <td class="kook-num" id="footZappers">—</td>
           <td class="kook-num" id="footZapCount">—</td>
@@ -1973,7 +1973,7 @@ function render(lang) {
     })[0];
     const ls = fmtNum(totalSats(least), lang);
     perfectHtml = '<div class="kook-strike-potential">'+(lang==="es"
-      ? '⚡ <strong>¡Racha perfecta!</strong> Las '+NOTES.length+' salidas han recibido zap — todas, de la #'+firstId+' a la #'+lastId+'.<br>'+
+      ? '⚡ <strong>¡Racha perfecta!</strong> Las '+NOTES.length+' salidas han recibido al menos un zap — todas, de la #'+firstId+' a la #'+lastId+'.<br>'+
         outingLink(least,"es")+' es la menos zapeada, con solo '+ls+' sats. Si alguien la zapeara, le daría un empujón al proyecto.'
       : '⚡ <strong>Perfect streak!</strong> All '+NOTES.length+' outings have been zapped — every single one, from #'+firstId+' to #'+lastId+'.<br>'+
         outingLink(least,"en")+' is the least zapped, with just '+ls+' sats. If someone zapped it, it would give the project a boost.'
@@ -2040,8 +2040,7 @@ function render(lang) {
   renderOuters(lang);
   renderRankings(lang, fullRanking);
 
-  if (document.getElementById("footNotes")) {
-    document.getElementById("footNotes").textContent=NOTES.length+(lang==="es"?" salidas":" outings");
+  if (document.getElementById("footBags")) {
     document.getElementById("footBags").textContent=fmtBolsasNum(totalBags);
     document.getElementById("footSats").textContent=fmtNum(totalSatsAll);
   }
