@@ -593,6 +593,16 @@ html, body {
     <h2 data-lang-en="">🏅 Records</h2>
     <div class="kook-log-best" id="bestGrid"></div>
 
+    <!-- OTHER ZAPPED NOTES (no_notes) -->
+    <div id="extraSection" style="display:none;">
+      <h2 data-lang-es="">📝 Registro de notas de satsfortrash zapeadas</h2>
+      <h2 data-lang-en="">📝 Log of zapped satsfortrash notes</h2>
+      <p data-lang-es="">Notas de satsfortrash que no son salidas pero han recibido zaps. Sus sats cuentan en los totales del proyecto.</p>
+      <p data-lang-en="">Satsfortrash notes that aren't outings but received zaps. Their sats count toward the project totals.</p>
+      <div class="kook-feed" id="extraFeed"></div>
+      <div class="kook-feed-summary" id="extraSummary"></div>
+    </div>
+
     <!-- OUTINGS FEED -->
     <h2 data-lang-es="">📋 Salidas</h2>
     <h2 data-lang-en="">📋 Outings</h2>
@@ -647,7 +657,12 @@ const URL_ZAPS    = "https://docs.google.com/spreadsheets/d/" + SHEET_ID + "/gvi
 const URL_ZAPPERS = "https://docs.google.com/spreadsheets/d/" + SHEET_ID + "/gviz/tq?tqx=out:csv&sheet=Zappers";
 const URL_SPOTS   = "https://docs.google.com/spreadsheets/d/" + SHEET_ID + "/gviz/tq?tqx=out:csv&sheet=Spots";
 
+// Sats for Trash notes that aren't outings but received zaps. Their zaps live
+// in the Zaps tab under the note's id and count toward the sats totals and
+// charts, but not toward outings, per-outing averages or records.
+const URL_NONOTES = "https://docs.google.com/spreadsheets/d/" + SHEET_ID + "/gviz/tq?tqx=out:csv&sheet=no_notes";
 let NOTES = [], ZAPPERS = {}, SPOTS = {};
+let EXTRA_NOTES = [];
 let ITEM_COLS = [];   // [{key,index}] — special-item columns detected in the Notes header
 let currentLang = "en";
 let pageNotas = 0;
@@ -751,6 +766,8 @@ function parseCSV(text) {
 function normalizaFecha(s) {
   s=String(s).trim();
   if (/^\d{4}-\d{2}-\d{2}$/.test(s)) return s;
+  const iso=s.match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/);
+  if (iso) return iso[1]+"-"+iso[2].padStart(2,"0")+"-"+iso[3].padStart(2,"0");
   const m=s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
   if (m) return m[3]+"-"+m[2].padStart(2,"0")+"-"+m[1].padStart(2,"0");
   return s;
@@ -787,9 +804,10 @@ async function fetchCsv(url, label) {
 async function loadData() {
   const lang = getLang();
   document.getElementById("warningBox").style.display = "none";
-  const [notesR, zapsR, zappersR, spotsR] = await Promise.allSettled([
+  const [notesR, zapsR, zappersR, spotsR, noNotesR] = await Promise.allSettled([
     fetchCsv(URL_NOTES,"Notes"), fetchCsv(URL_ZAPS,"Zaps"),
-    fetchCsv(URL_ZAPPERS,"Zappers"), fetchCsv(URL_SPOTS,"Spots")
+    fetchCsv(URL_ZAPPERS,"Zappers"), fetchCsv(URL_SPOTS,"Spots"),
+    fetchCsv(URL_NONOTES,"no_notes")
   ]);
   if (notesR.status==="rejected") { showError(notesR.reason&&notesR.reason.message); return; }
   const rowsN = notesR.value;
@@ -857,6 +875,22 @@ async function loadData() {
   }
   if (NOTES.length===0) { showError(lang==="es"?"No hay notas válidas":"No valid notes"); return; }
 
+  // no_notes — non-critical. A note with no date falls back to its earliest
+  // zap date; zaps with no zap_date fall back to the note date.
+  EXTRA_NOTES = [];
+  if (noNotesR.status==="fulfilled") {
+    noNotesR.value.slice(1).forEach(r => {
+      if (!r[0]||!r[2]) return;
+      const id=String(r[0]).trim(), eventId=String(r[2]).trim(), imageUrl=String(r[3]||"").trim();
+      const raw=zapsById[id]||[];
+      const isoOk = d => /^\d{4}-\d{2}-\d{2}$/.test(d);
+      let date=r[1] ? normalizaFecha(r[1]) : "";
+      if (!isoOk(date)) date = raw.map(z=>z.zapDate).filter(isoOk).sort()[0] || "";
+      const zaps=raw.map(z=>({npub:z.npub,sats:z.sats,zappedOuter:z.zappedOuter,date:isoOk(z.zapDate)?z.zapDate:date}));
+      EXTRA_NOTES.push({id,date,eventId,imageUrl,zaps});
+    });
+  }
+
   document.getElementById("loadingBox").style.display = "none";
   document.getElementById("content").style.display = "block";
   currentLang = lang;
@@ -900,9 +934,17 @@ function itemIcon(key) {
 
 // byZapDate=false: everything bucketed by the month the note was posted.
 // byZapDate=true: sats and zaps bucketed by the month each zap arrived.
-function monthlyBuckets(lang, byZapDate) {
+// withExtra=true: also add sats and zaps from non-outing notes (no_notes).
+function monthlyBuckets(lang, byZapDate, withExtra) {
   const buckets = {};
   const bucket = key => buckets[key] || (buckets[key] = { key, outings:0, bags:0, sats:0, zaps:0, minutes:0 });
+  if (withExtra) EXTRA_NOTES.forEach(n => n.zaps.forEach(z => {
+    const d = byZapDate ? z.date : n.date;
+    if (!d) return;
+    const b = bucket(d.slice(0,7));
+    b.sats += z.sats;
+    b.zaps++;
+  }));
   if (byZapDate) {
     NOTES.forEach(n => n.zaps.forEach(z => {
       const b = bucket(z.date.slice(0,7));
@@ -1064,11 +1106,13 @@ function renderSpecialFinds(lang) {
 function renderStats(lang) {
   const dec = lang==="es" ? "," : ".";
   const totalBags = NOTES.reduce((s,n)=>s+n.bags,0);
-  const totalSatsAll = NOTES.reduce((s,n)=>s+totalSats(n),0);
-  const totalZaps = NOTES.reduce((s,n)=>s+n.zaps.length,0);
+  const ALL_ZAPPED = NOTES.concat(EXTRA_NOTES);   // outings + non-outing notes
+  const totalSatsOutings = NOTES.reduce((s,n)=>s+totalSats(n),0);
+  const totalSatsAll = ALL_ZAPPED.reduce((s,n)=>s+totalSats(n),0);
+  const totalZaps = ALL_ZAPPED.reduce((s,n)=>s+n.zaps.length,0);
   const totalMinutes = NOTES.reduce((s,n)=>s+(n.minutes||0),0);
   const totalHours = totalMinutes / 60;
-  const zappersUnicos = new Set(NOTES.flatMap(n=>n.zaps.map(z=>z.npub))).size;
+  const zappersUnicos = new Set(ALL_ZAPPED.flatMap(n=>n.zaps.map(z=>z.npub))).size;
   const uniqueSpots = new Set(NOTES.map(n=>n.spotId).filter(Boolean)).size;
   const timedNotes = NOTES.filter(n=>n.minutes>0);
   const avgMinutes = timedNotes.length ? Math.round(timedNotes.reduce((s,n)=>s+n.minutes,0)/timedNotes.length) : 0;
@@ -1127,7 +1171,7 @@ function renderStats(lang) {
         partial:"month in progress" };
 
   const zappedOutings = NOTES.filter(n=>n.zaps.length>0).length;
-  const satsPerOuting = NOTES.length ? totalSatsAll/NOTES.length : 0;
+  const satsPerOuting = NOTES.length ? totalSatsOutings/NOTES.length : 0;
   const satsPerZap    = totalZaps > 0 ? totalSatsAll/totalZaps : 0;
   const satsPerZapper = zappersUnicos > 0 ? totalSatsAll/zappersUnicos : 0;
   const zappedPct     = NOTES.length ? Math.round((zappedOutings/NOTES.length)*100) : 0;
@@ -1138,14 +1182,15 @@ function renderStats(lang) {
     card(zappersUnicos,        S.zappers, '<b>'+fmtNum(Math.round(satsPerZapper))+'</b> '+S.perZapper) +
     card(zappedOutings+"/"+NOTES.length, S.zapped, '<b>'+zappedPct+'%</b> '+S.ofOutings);
 
-  renderBarChart("chartSats", S.mSats, buckets, b=>b.sats,
+  const satsBuckets = monthlyBuckets(lang, false, true);
+  renderBarChart("chartSats", S.mSats, satsBuckets, b=>b.sats,
     v => v>=1000 ? (v/1000).toFixed(1).replace(".",dec)+"k" : String(v));
-  renderBarChart("chartZaps", S.mZaps, buckets, b=>b.zaps, v=>String(v));
-  const zapBuckets = monthlyBuckets(lang, true);
+  renderBarChart("chartZaps", S.mZaps, satsBuckets, b=>b.zaps, v=>String(v));
+  const zapBuckets = monthlyBuckets(lang, true, true);
   renderBarChart("chartSatsByZap", S.mSatsZ, zapBuckets, b=>b.sats,
     v => v>=1000 ? (v/1000).toFixed(1).replace(".",dec)+"k" : String(v));
   renderBarChart("chartZapsByZap", S.mZapsZ, zapBuckets, b=>b.zaps, v=>String(v));
-  setChartNote("satsChartNote", buckets.concat(zapBuckets), S.partial);
+  setChartNote("satsChartNote", satsBuckets.concat(zapBuckets), S.partial);
 
   // ── RECORDS ──
   const bestSats = [...NOTES].sort((a,b)=>totalSats(b)-totalSats(a))[0];
@@ -1167,6 +1212,49 @@ function renderStats(lang) {
     bestCard(R.sats, fmtNum(totalSats(bestSats))+' ⚡', bestSats) +
     bestCard(R.bags, fmtBolsasNum(bestBags.bags)+' 💰', bestBags) +
     (bestTime ? bestCard(R.time, bestTime.minutes+'min ⏱️', bestTime) : '');
+}
+
+// ── Other zapped notes (no_notes) ─────────────────────────────────────────
+function renderExtraNotes(lang) {
+  const section = document.getElementById("extraSection");
+  const feed = document.getElementById("extraFeed");
+  if (!section || !feed) return;
+  const list = EXTRA_NOTES.filter(n => n.zaps.length > 0);
+  section.style.display = list.length ? "block" : "none";
+  if (!list.length) return;
+  // Newest first; undated notes go last
+  list.sort((a,b) => (b.date||"").localeCompare(a.date||""));
+  const L = lang==="es"
+    ? { note:"nota", notes:"notas", zap:"zap", zaps:"zaps", view:"Ver nota", noDate:"sin fecha", alt:"Nota del " }
+    : { note:"note", notes:"notes", zap:"zap", zaps:"zaps", view:"View note", noDate:"no date", alt:"Note on " };
+
+  feed.innerHTML = list.map(n => {
+    const sats = totalSats(n);
+    const dateStr = n.date ? fmtFecha(n.date, lang) : L.noDate;
+    const thumb = n.imageUrl
+      ? '<a href="'+noteUrl(n.eventId)+'" target="_blank" rel="noopener" class="kook-feed-thumb"><img src="'+escHtml(n.imageUrl)+'" alt="'+escHtml(L.alt+dateStr)+'" loading="lazy"></a>'
+      : '<a href="'+noteUrl(n.eventId)+'" target="_blank" rel="noopener" class="kook-feed-thumb"><div class="kook-feed-thumb-empty">📝</div></a>';
+    const sortedZaps = [...n.zaps].sort((a,b)=>b.sats-a.sats);
+    const avatars = sortedZaps.slice(0,5).map(z=>zapperAvatar(z.npub,22)).join("");
+    const more = sortedZaps.length > 5 ? '<span class="kook-feed-num">+'+(sortedZaps.length-5)+'</span>' : '';
+    return '<div class="kook-feed-row">'+
+      thumb+
+      '<div class="kook-feed-body">'+
+        '<div class="kook-feed-top"><span class="kook-feed-date">'+dateStr+'</span></div>'+
+        '<div class="kook-feed-meta"><span><strong>'+n.zaps.length+'</strong> '+(n.zaps.length===1?L.zap:L.zaps)+'</span></div>'+
+        '<div class="kook-feed-zapline"><span class="kook-feed-sats">'+fmtNum(sats)+' ⚡</span>'+
+          '<span class="kook-feed-avatars">'+avatars+'</span>'+more+'</div>'+
+      '</div>'+
+      '<a href="'+noteUrl(n.eventId)+'" target="_blank" rel="noopener" class="kook-feed-link" title="'+escHtml(L.view)+'">›</a>'+
+    '</div>';
+  }).join("");
+
+  const tSats = list.reduce((s,n)=>s+totalSats(n),0);
+  const tZaps = list.reduce((s,n)=>s+n.zaps.length,0);
+  document.getElementById("extraSummary").innerHTML =
+    '<strong>'+list.length+'</strong> '+(list.length===1?L.note:L.notes)+' · '+
+    '<strong>'+fmtNum(tSats)+'</strong> sats · '+
+    '<strong>'+tZaps+'</strong> '+(tZaps===1?L.zap:L.zaps);
 }
 
 // ── Filter + sort controls ────────────────────────────────────────────────
@@ -1367,6 +1455,7 @@ function render(lang) {
   currentLang = lang;
   renderStats(lang);
   populateControls(lang);
+  renderExtraNotes(lang);
   renderSpecialFinds(lang);
   renderSpots(lang);
   renderFeed(lang);

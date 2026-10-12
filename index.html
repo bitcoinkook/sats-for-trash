@@ -1142,6 +1142,11 @@ const URL_NOTES   = "https://docs.google.com/spreadsheets/d/" + SHEET_ID + "/gvi
 const URL_ZAPS    = "https://docs.google.com/spreadsheets/d/" + SHEET_ID + "/gviz/tq?tqx=out:csv&sheet=Zaps";
 const URL_ZAPPERS = "https://docs.google.com/spreadsheets/d/" + SHEET_ID + "/gviz/tq?tqx=out:csv&sheet=Zappers";
 const URL_OUTERS  = "https://docs.google.com/spreadsheets/d/" + SHEET_ID + "/gviz/tq?tqx=out:csv&sheet=outers";
+// Sats for Trash notes that aren't outings but received zaps. Their zaps live
+// in the Zaps tab under the note's id; they count toward sats, zaps, zappers
+// and the zapper ranking, but not toward outings, streaks or loyalty.
+const URL_NONOTES = "https://docs.google.com/spreadsheets/d/" + SHEET_ID + "/gviz/tq?tqx=out:csv&sheet=no_notes";
+let EXTRA_NOTES = [];
 let NOTES = [];
 let ZAPPERS = {};
 let OUTERS = {};  // keyed by id_outer (as string): { displayName, npub, nip05, lnAddress, imageUrl }
@@ -1295,6 +1300,11 @@ function computeRanking() {
     });
     seen.forEach(u=>{ distinctOutings[u]=(distinctOutings[u]||0)+1; });
   });
+  // Zaps on non-outing notes add sats and zap count, but not loyalty
+  EXTRA_NOTES.forEach(n=>n.zaps.forEach(z=>{
+    totalSats[z.npub]=(totalSats[z.npub]||0)+z.sats;
+    zapCount[z.npub]=(zapCount[z.npub]||0)+1;
+  }));
   return Object.entries(totalSats).map(([npub,sats])=>{
     const apars=distinctOutings[npub]||1;
     const puntos=Math.round(sats*(1+Math.log(apars)*LOYALTY_FACTOR));
@@ -1473,6 +1483,8 @@ function parseCSV(text) {
 function normalizaFecha(s) {
   s=String(s).trim();
   if (/^\d{4}-\d{2}-\d{2}$/.test(s)) return s;
+  const iso=s.match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/);
+  if (iso) return iso[1]+"-"+iso[2].padStart(2,"0")+"-"+iso[3].padStart(2,"0");
   const m=s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
   if (m) return m[3]+"-"+m[2].padStart(2,"0")+"-"+m[1].padStart(2,"0");
   return s;
@@ -1534,11 +1546,12 @@ async function loadData() {
   document.getElementById("warningBox").style.display = "none";
 
   // Fetch all four independently — Notes is critical, others are optional
-  const [notesResult, zapsResult, zappersResult, outersResult] = await Promise.allSettled([
+  const [notesResult, zapsResult, zappersResult, outersResult, noNotesResult] = await Promise.allSettled([
     fetchCsv(URL_NOTES, "Notes"),
     fetchCsv(URL_ZAPS, "Zaps"),
     fetchCsv(URL_ZAPPERS, "Zappers"),
-    fetchCsv(URL_OUTERS, "outers")
+    fetchCsv(URL_OUTERS, "outers"),
+    fetchCsv(URL_NONOTES, "no_notes")
   ]);
 
   // Notes is critical — fail fully if it's missing
@@ -1628,6 +1641,16 @@ async function loadData() {
     const rawZaps = zapsById[id] || [];
     const zaps = rawZaps.map(z => ({ npub: z.npub, sats: z.sats, zappedOuter: z.zappedOuter }));
     NOTES.push({ id, date, eventId, bags, imageUrl, spotId, outerId, minutes, zaps });
+  }
+
+  // no_notes — non-critical; only the zaps matter on this page
+  EXTRA_NOTES = [];
+  if (noNotesResult.status === "fulfilled") {
+    noNotesResult.value.slice(1).forEach(r => {
+      if (!r[0] || !r[2]) return;
+      const id = String(r[0]).trim();
+      EXTRA_NOTES.push({ id, eventId: String(r[2]).trim(), zaps: zapsById[id] || [] });
+    });
   }
 
   if (NOTES.length === 0) {
@@ -1891,7 +1914,8 @@ function render(lang) {
   const totalMinutes=NOTES.reduce((s,n)=>s+(n.minutes||0),0);
   const totalHours=totalMinutes/60;
   const totalLiters=totalBags*10;   // 1 bag = 10 litres
-  const totalSatsAll=NOTES.reduce((s,n)=>s+totalSats(n),0);
+  const totalSatsOutings=NOTES.reduce((s,n)=>s+totalSats(n),0);
+  const totalSatsAll=totalSatsOutings+EXTRA_NOTES.reduce((s,n)=>s+totalSats(n),0);
   const fullRanking=computeRanking();
   const zappersUnicos=fullRanking.length;
 
@@ -2042,9 +2066,10 @@ function render(lang) {
 
   if (document.getElementById("footBags")) {
     document.getElementById("footBags").textContent=fmtBolsasNum(totalBags);
-    document.getElementById("footSats").textContent=fmtNum(totalSatsAll);
+    document.getElementById("footSats").textContent=fmtNum(totalSatsOutings);
   }
-  document.getElementById("footZappers").textContent=zappersUnicos;
+  // Mini log footer covers outings only
+  document.getElementById("footZappers").textContent=new Set(NOTES.flatMap(n=>n.zaps.map(z=>z.npub))).size;
   document.getElementById("footZapCount").textContent=NOTES.reduce((s,n)=>s+n.zaps.length,0);
 }
 
