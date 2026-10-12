@@ -5,10 +5,17 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="color-scheme" content="light">
 <title>Log — Sats for Trash</title>
-<meta name="description" content="Full outings log, stats, sacred spots and zapper ranking for Sats for Trash.">
+<meta name="description" content="Full outings log, stats, sacred spots and special finds for Sats for Trash.">
 <meta property="og:title" content="Log — Sats for Trash">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://satsfortrash.com/log.html">
+<meta property="og:description" content="Full outings log, stats, sacred spots and special finds for Sats for Trash.">
+<meta property="og:image" content="https://satsfortrash.com/og_image.png">
+<meta property="og:image:alt" content="Sats for Trash — picking up trash from neglected natural spaces, paid in sats via Nostr.">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Log — Sats for Trash">
+<meta name="twitter:description" content="Full outings log, stats, sacred spots and special finds for Sats for Trash.">
+<meta name="twitter:image" content="https://satsfortrash.com/og_image.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -868,7 +875,7 @@ const ITEM_META = {
   construction_bags:      { icon:"🧱", en:"Construction bags",  es:"Sacos de obra" },
   car_tires:              { icon:"🛞", en:"Car tires",          es:"Neumáticos" },
   mattresses:             { icon:"🛏️", en:"Mattresses",         es:"Colchones" },
-  nails:                  { icon:"🔩", en:"Nails",              es:"Clavos" },
+  nails:                  { icon:"🔩", en:"Rusty nails",        es:"Clavos oxidados" },
   barrels:                { icon:"🛢️", en:"Barrels",            es:"Bidones" },
   big_liquid_containers:  { icon:"🧴", en:"Large containers",   es:"Garrafas" },
   fishing_boxes:          { icon:"🧊", en:"Fishing boxes",      es:"Cajas de pesca" },
@@ -900,8 +907,8 @@ function monthlyBuckets(lang) {
   const monthsEn = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
   const names = lang === "es" ? monthsEs : monthsEn;
   // Flag the month that hasn't finished yet, so its partial total isn't read
-  // as a drop. Compared against the latest note rather than the clock, so the
-  // chart stays honest if the sheet is behind.
+  // as a drop. Uses the device clock, so a month only counts as in progress
+  // while it is actually the current month.
   const now = new Date();
   const currentKey = now.getFullYear() + "-" + String(now.getMonth()+1).padStart(2,"0");
 
@@ -1006,7 +1013,7 @@ function renderSpecialFinds(lang) {
     const alt = itemLabel(k, lang) + " — " + fmtFecha(latest.note.date, lang);
     const photo = latest.note.imageUrl
       ? '<a class="kook-find-photo" href="'+noteUrl(latest.note.eventId)+'" target="_blank" rel="noopener">'+
-          '<img src="'+escHtml(latest.note.imageUrl)+'" alt="'+escHtml(alt)+'" loading="lazy"></a>'
+          '<img src="'+localOutingImage(latest.note.id)+'" data-fallback="'+escHtml(latest.note.imageUrl)+'" alt="'+escHtml(alt)+'" loading="lazy" onerror="this.onerror=null;this.src=this.dataset.fallback"></a>'
       : '<div class="kook-find-photo"><div class="kook-find-photo-empty">'+itemIcon(k)+'</div></div>';
 
     // Remaining outings as small thumbnails
@@ -1014,7 +1021,7 @@ function renderSpecialFinds(lang) {
     const thumbs = rest.length ? '<div class="kook-find-thumbs">'+rest.map(e => {
       const t = fmtFecha(e.note.date, lang) + (e.count>1 ? " ×"+e.count : "");
       const inner = e.note.imageUrl
-        ? '<img src="'+escHtml(e.note.imageUrl)+'" alt="'+escHtml(t)+'" loading="lazy">'
+        ? '<img src="'+localOutingImage(e.note.id)+'" data-fallback="'+escHtml(e.note.imageUrl)+'" alt="'+escHtml(t)+'" loading="lazy" onerror="this.onerror=null;this.src=this.dataset.fallback">'
         : '<span class="kook-find-thumb-date">'+fmtFecha(e.note.date, lang)+'</span>';
       return '<a class="kook-find-thumb" href="'+noteUrl(e.note.eventId)+'" target="_blank" rel="noopener" title="'+escHtml(t)+'">'+inner+'</a>';
     }).join("")+'</div>' : '';

@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="color-scheme" content="light">
-<title>Sats 4 Trash</title>
+<title>Sats for Trash</title>
 <meta name="description" content="Picking up trash from neglected natural spaces, paid in sats via Nostr.">
 <meta property="og:title" content="Sats for Trash">
 <meta property="og:description" content="Picking up trash from neglected natural spaces, paid in sats via Nostr.">
@@ -47,6 +47,7 @@ html, body {
   max-width: 820px;
   line-height: 1.7;
   margin: 0 auto;
+  padding: 0 16px;
 }
 .kook-trash .kook-lang {
   display: flex;
@@ -510,7 +511,19 @@ html, body {
   text-align: right; white-space: nowrap;
 }
 .kook-trash table.kook-data tfoot tr { background: var(--brand-orange); color: #fff; font-weight: 700; }
-.kook-trash table.kook-data tfoot td { padding: 10px 12px; font-family: var(--font-mono); }
+.kook-trash table.kook-data tfoot td { padding: 10px 12px; font-family: var(--font-mono); font-size: var(--text-meta); }
+/* Outing cell — date links to the Nostr note, outing number underneath */
+.kook-trash table.kook-data .kook-outing-cell { white-space: nowrap; }
+.kook-trash table.kook-data a.kook-date { border-bottom: 1px dotted var(--brand-orange); }
+.kook-trash table.kook-data .kook-outing-id {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: var(--text-label);
+  color: #999;
+  font-weight: 400;
+  margin-top: 2px;
+}
+.kook-trash table.kook-data tfoot .kook-outing-id { color: #fff; opacity: 0.85; }
 /* Merged zappers+zaps cell — internal grid keeps name and amount on the same physical
    line per zap, so wrapping a long name pushes its amount with it. */
 .kook-trash table.kook-data .kook-zap-merged-cell {
@@ -1060,7 +1073,7 @@ html, body {
     <h2 data-lang-es="">📸 Fotos</h2>
     <h2 data-lang-en="">📸 Photos</h2>
     <p data-lang-es="">Cada foto corresponde a una salida, la más reciente al principio. Pulsa cualquier foto para verla en grande. Desde ahí puedes abrir la nota original en Nostr y zapearla.</p>
-    <p data-lang-en="">One photo per Outing, newest first. Tap any photo to view it larger. From there you can open the original note on Nostr and zap it.</p>
+    <p data-lang-en="">One photo per outing, newest first. Tap any photo to view it larger. From there you can open the original note on Nostr and zap it.</p>
     <div class="kook-gallery" id="gallery"></div>
     <div class="kook-pagination" id="paginationGallery"></div>
 
@@ -1082,9 +1095,7 @@ html, body {
     <div class="kook-table-wrap" id="outingsLogAnchor">
       <table class="kook-data">
         <thead><tr>
-          <th class="kook-num">#</th>
-          <th><span data-lang-es="">Fecha</span><span data-lang-en="">Date</span></th>
-          <th><span data-lang-es="">Nota</span><span data-lang-en="">Note</span></th>
+          <th><span data-lang-es="">Salida</span><span data-lang-en="">Outing</span></th>
           <th class="kook-num"><span data-lang-es="">Bolsas</span><span data-lang-en="">Bags</span></th>
           <th class="kook-num"><span data-lang-es="">Zappers</span><span data-lang-en="">Zappers</span></th>
           <th class="kook-num"><span data-lang-es="">Zaps</span><span data-lang-en="">Zaps</span></th>
@@ -1092,9 +1103,7 @@ html, body {
         </tr></thead>
         <tbody id="dataBody"></tbody>
         <tfoot><tr>
-          <td></td>
-          <td><span data-lang-es="">TOTAL</span><span data-lang-en="">TOTAL</span></td>
-          <td class="kook-num" id="footNotes">—</td>
+          <td><span data-lang-es="">TOTAL</span><span data-lang-en="">TOTAL</span><span class="kook-outing-id" id="footNotes">—</span></td>
           <td class="kook-num" id="footBags">—</td>
           <td class="kook-num" id="footZappers">—</td>
           <td class="kook-num" id="footZapCount">—</td>
@@ -1780,9 +1789,8 @@ function renderTabla(lang) {
     }
     const tr=document.createElement("tr");
     tr.innerHTML=
-      '<td class="kook-num kook-num-orange">'+n.id+'</td>'+
-      '<td class="kook-date">'+fmtFecha(n.date,lang)+'</td>'+
-      '<td><a href="'+noteUrl(n.eventId)+'" target="_blank" rel="noopener">'+(lang==="es"?"ver":"view")+'</a></td>'+
+      '<td class="kook-outing-cell"><a class="kook-date" href="'+noteUrl(n.eventId)+'" target="_blank" rel="noopener">'+fmtFecha(n.date,lang)+' ↗</a>'+
+      '<span class="kook-outing-id">#'+n.id+'</span></td>'+
       '<td class="kook-num">'+fmtBolsas2(n.bags,lang)+'</td>'+
       zapMergedCell+
       '<td class="kook-num kook-sats-total">'+fmtNum(sats)+'</td>';
@@ -1942,6 +1950,42 @@ function render(lang) {
       (lang==="es" ? "⚡ Ver y zapear en Nostr" : "⚡ View &amp; zap on Nostr")+'</a></div></div>'
     : '';
 
+  // Perfect streak messages. When every outing has a zap, celebrate and point
+  // at the least-zapped one; when exactly one is missing, point at that one.
+  // These replace the general streak hints above.
+  const unzapped = NOTES.filter(n => n.zaps.length === 0);
+  const idsAsc = NOTES.map(n => parseInt(n.id)).sort((a,b)=>a-b);
+  const firstId = idsAsc[0], lastId = idsAsc[idsAsc.length-1];
+  const outingLink = (n, lang) =>
+    '<a href="'+noteUrl(n.eventId)+'" target="_blank" rel="noopener">'+
+      (lang==="es" ? "La salida #" : "Outing #")+n.id+' ('+fmtFecha(n.date,lang)+')</a>';
+  const zapCta = (n, lang) =>
+    '<div class="kook-last-actions"><a href="'+noteUrl(n.eventId)+'" target="_blank" rel="noopener" class="kook-last-zapbtn">'+
+    (lang==="es" ? "⚡ Ver y zapear en Nostr" : "⚡ View &amp; zap on Nostr")+'</a></div>';
+  let perfectHtml = "";
+  if (unzapped.length === 0) {
+    // Least sats; ties go to the most recent outing
+    const least = [...NOTES].sort((a,b)=>{
+      const d = totalSats(a)-totalSats(b);
+      if (d !== 0) return d;
+      const c = b.date.localeCompare(a.date);
+      return c !== 0 ? c : parseInt(b.id)-parseInt(a.id);
+    })[0];
+    const ls = fmtNum(totalSats(least), lang);
+    perfectHtml = '<div class="kook-strike-potential">'+(lang==="es"
+      ? '⚡ <strong>¡Racha perfecta!</strong> Las '+NOTES.length+' salidas han recibido zap — todas, de la #'+firstId+' a la #'+lastId+'.<br>'+
+        outingLink(least,"es")+' es la menos zapeada, con solo '+ls+' sats. Si alguien la zapeara, le daría un empujón al proyecto.'
+      : '⚡ <strong>Perfect streak!</strong> All '+NOTES.length+' outings have been zapped — every single one, from #'+firstId+' to #'+lastId+'.<br>'+
+        outingLink(least,"en")+' is the least zapped, with just '+ls+' sats. If someone zapped it, it would give the project a boost.'
+    )+zapCta(least, lang)+'</div>';
+  } else if (unzapped.length === 1) {
+    const only = unzapped[0];
+    perfectHtml = '<div class="kook-strike-potential">'+(lang==="es"
+      ? '⚡ <strong>A un zap de la racha perfecta.</strong> '+outingLink(only,"es")+' aún no tiene zap. Si alguien la zapeara, las '+NOTES.length+' salidas quedarían zapeadas.'
+      : '⚡ <strong>One zap away from a perfect streak.</strong> '+outingLink(only,"en")+' has no zap yet. If someone zapped it, all '+NOTES.length+' outings would be zapped.'
+    )+zapCta(only, lang)+'</div>';
+  }
+
   const zapStreakBlock =
     '<p class="kook-milestone-subtitle">'+
       (lang==="es"?"Salidas consecutivas con al menos un zap recibido":"Consecutive outings that received at least one zap")+
@@ -1950,7 +1994,7 @@ function render(lang) {
       '<div class="kook-strike-card"><span class="kook-strike-val">'+strike.actual+'</span><span class="kook-strike-label">'+(lang==="es"?"Racha actual":"Current streak")+'</span></div>'+
       '<div class="kook-strike-card"><span class="kook-strike-val">'+strike.max+'</span><span class="kook-strike-label">'+(lang==="es"?"Máximo histórico":"All-time high")+'</span></div>'+
     '</div>'+
-    (potentialHtml || zapNudgeHtml);
+    (perfectHtml || potentialHtml || zapNudgeHtml);
 
   document.getElementById("milestones").innerHTML=
     renderMilestone("🌅","Salidas","Outings",NOTES.length,HITOS.salidas,fmtNum,lang)+
@@ -1997,7 +2041,7 @@ function render(lang) {
   renderRankings(lang, fullRanking);
 
   if (document.getElementById("footNotes")) {
-    document.getElementById("footNotes").textContent=NOTES.length;
+    document.getElementById("footNotes").textContent=NOTES.length+(lang==="es"?" salidas":" outings");
     document.getElementById("footBags").textContent=fmtBolsasNum(totalBags);
     document.getElementById("footSats").textContent=fmtNum(totalSatsAll);
   }
@@ -2054,7 +2098,7 @@ function toggleNormie(lang) {
   const isOpen = el.classList.contains("open");
   el.classList.toggle("open");
   document.getElementById(btn).textContent = isOpen
-    ? (lang === "es" ? "► ¿Primera vez por aquí? Qué narices son Nostr, los sats y los zaps" : "► New here? What the heck's Nostr, sats and zaps")
+    ? (lang === "es" ? "► ¿Primera vez aquí? Qué es Nostr, los sats y los zaps" : "► New here? What the heck's Nostr, sats and zaps")
     : (lang === "es" ? "▼ Cerrar" : "▼ Close");
 }
 
