@@ -161,6 +161,16 @@ html, body {
   line-height: 1.3;
 }
 .kook-trash .kook-headline-sub b { color: #cfcfcf; font-weight: 600; }
+/* Bag size under the Bags label — same as the index sublabel */
+.kook-trash .kook-headline-unit {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 0.85em;
+  text-transform: none;
+  letter-spacing: var(--letter-label);
+  color: #888;
+  margin-top: 3px;
+}
 /* Monthly charts — one small chart per metric, each with its own scale */
 .kook-trash .kook-charts {
   display: grid;
@@ -1136,10 +1146,10 @@ function renderStats(lang) {
 
   // ── TRASH ──
   const T = lang==="es"
-    ? { outings:"Salidas", bags:"Bolsas", time:"Tiempo", spots:"Spots",
+    ? { outings:"Salidas", bags:"Bolsas", bagSize:"(2,5 gal/10 L)", time:"Tiempo", spots:"Spots",
         perOuting:"por salida", minOuting:"de media", topSpot:"el más visitado",
         mBags:"Bolsas por mes", mOutings:"Salidas por mes", partial:"mes en curso" }
-    : { outings:"Outings", bags:"Bags", time:"Time", spots:"Spots",
+    : { outings:"Outings", bags:"Bags", bagSize:"(2.5 gal/10 L)", time:"Time", spots:"Spots",
         perOuting:"per outing", minOuting:"average", topSpot:"most visited",
         mBags:"Bags per month", mOutings:"Outings per month", partial:"month in progress" };
 
@@ -1154,7 +1164,7 @@ function renderStats(lang) {
 
   document.getElementById("trashStats").innerHTML =
     card(NOTES.length,            T.outings, '<b>'+avgMinutes+' min</b> '+T.minOuting) +
-    card(fmtBolsasNum(totalBags), T.bags,    '<b>'+dp1(bagsPerOuting)+'</b> '+T.perOuting) +
+    card(fmtBolsasNum(totalBags), T.bags+'<span class="kook-headline-unit">'+T.bagSize+'</span>', '<b>'+dp1(bagsPerOuting)+'</b> '+T.perOuting) +
     card(fmtDuration(totalMinutes), T.time,  '<b>'+dp1(bagsPerHour)+'</b> '+T.bags.toLowerCase()+'/h') +
     card(uniqueSpots,             T.spots,   '<b>'+escHtml(topSpotName)+'</b><br>'+T.topSpot);
 

@@ -961,18 +961,20 @@ html, body {
         <span class="kook-stat-value" id="statOutings">—</span>
         <span class="kook-stat-label" data-lang-es="">Salidas</span>
         <span class="kook-stat-label" data-lang-en="">Outings</span>
+        <span class="kook-stat-sublabel" id="statOutingsMonth"></span>
       </div>
       <div class="kook-stat-card">
         <span class="kook-stat-value" id="statSats">—</span>
         <span class="kook-stat-label" data-lang-es="">Sats recibidos</span>
         <span class="kook-stat-label" data-lang-en="">Sats received</span>
+        <span class="kook-stat-sublabel" id="statSatsMonth"></span>
       </div>
       <div class="kook-stat-card">
         <span class="kook-stat-value" id="statLiters">—</span>
         <span class="kook-stat-label" data-lang-es="">Bolsas de basura</span>
         <span class="kook-stat-label" data-lang-en="">Bags of trash</span>
-        <span class="kook-stat-sublabel" data-lang-es="">(2,5 gal/10 ltr)</span>
-        <span class="kook-stat-sublabel" data-lang-en="">(2.5 gal/10 ltr)</span>
+        <span class="kook-stat-sublabel" data-lang-es="">(2,5 gal/10 L)</span>
+        <span class="kook-stat-sublabel" data-lang-en="">(2.5 gal/10 L)</span>
       </div>
     </div>
 
@@ -987,8 +989,8 @@ html, body {
         <div class="kook-podium-mini" id="podiumSats"></div>
       </div>
       <div>
-        <div class="kook-duo-title" data-lang-es="">🔁 Más zaps</div>
-        <div class="kook-duo-title" data-lang-en="">🔁 Most zaps</div>
+        <div class="kook-duo-title" data-lang-es="">Más zaps</div>
+        <div class="kook-duo-title" data-lang-en="">Most zaps</div>
         <div class="kook-podium-mini" id="podiumZaps"></div>
       </div>
     </div>
@@ -1163,6 +1165,7 @@ const HITOS = {
   bags:  [21,69,210,420,690,999],
   sats:    [21000,69000,210000,420000,690000,999999],
   zappers: [21,69,210,420,690,999],
+  zaps:    [21,69,210,420,690,999],
   hours:   [21,69,210,420,690,999],
   // Litres = bags x 10, so the bag pattern scaled by 10 keeps both bars in step.
   liters:  [210,690,2100,4200,6900,9990]
@@ -1880,9 +1883,6 @@ function renderMiniPodium(id, entries, mainFn, midFn, subFn) {
 
 function renderRankings(lang, fullRanking) {
   const combinado=fullRanking || computeRanking();
-  const zapLabel  = lang==="es"?"zap enviado":"zap sent";
-  const zapLabelP = lang==="es"?"zaps enviados":"zaps sent";
-  const ptsLabel  = lang==="es"?"puntos":"points";
   document.getElementById("rankingList").innerHTML=
     combinado.slice(pageRankSats*PAGE_SIZE,(pageRankSats+1)*PAGE_SIZE)
       .map((e,i)=>{
@@ -1891,13 +1891,13 @@ function renderRankings(lang, fullRanking) {
         const prefix=pos<=3
           ? '<span class="kook-rank-medal">'+medals[pos-1]+'</span>'
           : '<span class="kook-rank-num">'+pos+'.</span>';
-        const detalle = fmtNum(e.sats)+" ⚡ sats · "+e.nZaps+" "+(e.nZaps===1?zapLabel:zapLabelP);
+        const detalle = fmtNum(e.sats)+" ⚡ · "+e.nZaps+" "+(e.nZaps===1?"zap":"zaps");
         return '<li class="kook-rank-entry">'+
           prefix+
           zapperAvatar(e.npub,32)+
           '<div class="kook-rank-body">'+
             '<div><strong class="kook-rank-name">'+zapperLink(e.npub)+'</strong>'+
-            ' <span class="kook-rank-points">· '+fmtNum(e.puntos)+' ⭐ '+ptsLabel+'</span></div>'+
+            ' <span class="kook-rank-points">· '+fmtNum(e.puntos)+' ⭐</span></div>'+
             '<div class="kook-rank-detail">'+detalle+'</div>'+
           '</div>'+
         '</li>';
@@ -1916,12 +1916,19 @@ function render(lang) {
   const totalLiters=totalBags*10;   // 1 bag = 10 litres
   const totalSatsOutings=NOTES.reduce((s,n)=>s+totalSats(n),0);
   const totalSatsAll=totalSatsOutings+EXTRA_NOTES.reduce((s,n)=>s+totalSats(n),0);
+  const totalZapsAll=NOTES.concat(EXTRA_NOTES).reduce((s,n)=>s+n.zaps.length,0);
   const fullRanking=computeRanking();
   const zappersUnicos=fullRanking.length;
 
   document.getElementById("statOutings").innerHTML=NOTES.length+'<span class="kook-stat-emoji">🌅</span>';
   document.getElementById("statLiters").innerHTML=fmtBolsasNum(totalBags)+'<span class="kook-stat-emoji">💰</span>';
   document.getElementById("statSats").innerHTML=fmtNum(totalSatsAll)+'<span class="kook-stat-emoji">⚡</span>';
+  // Per-month rates over the time elapsed since the project started.
+  const months=Math.max(1,(Date.now()-Date.UTC(2026,4,1))/(864e5*365.25/12));
+  const perMonth=lang==="es"?"al mes":"per month";
+  const oPerM=(NOTES.length/months).toFixed(1);
+  document.getElementById("statOutingsMonth").textContent=(lang==="es"?oPerM.replace(".",","):oPerM)+" "+perMonth;
+  document.getElementById("statSatsMonth").textContent=fmtNum(Math.round(totalSatsAll/months),lang)+" "+perMonth;
 
   // Top zappers: two podiums — most sats, and most zaps.
   // Sorted copies; never sort fullRanking in place, the ranking list depends on its order.
@@ -1933,7 +1940,7 @@ function render(lang) {
     function(e){ return fmtNum(e.puntos)+' \u2B50'; },
     function(e){ return e.nZaps+' '+(e.nZaps===1?zapUnit:zapsUnit); });
   renderMiniPodium("podiumZaps", byZaps,
-    function(e){ return e.nZaps+' \uD83D\uDD01'; },
+    function(e){ return e.nZaps+' '+(e.nZaps===1?zapUnit:zapsUnit); },
     function(e){ return fmtNum(e.sats)+' \u26A1'; },
     function(e){ return fmtNum(e.puntos)+' \u2B50'; });
 
@@ -1978,8 +1985,6 @@ function render(lang) {
   // at the least-zapped one; when exactly one is missing, point at that one.
   // These replace the general streak hints above.
   const unzapped = NOTES.filter(n => n.zaps.length === 0);
-  const idsAsc = NOTES.map(n => parseInt(n.id)).sort((a,b)=>a-b);
-  const firstId = idsAsc[0], lastId = idsAsc[idsAsc.length-1];
   const outingLink = (n, lang) =>
     '<a href="'+noteUrl(n.eventId)+'" target="_blank" rel="noopener">'+
       (lang==="es" ? "La salida #" : "Outing #")+n.id+' ('+fmtFecha(n.date,lang)+')</a>';
@@ -1997,9 +2002,9 @@ function render(lang) {
     })[0];
     const ls = fmtNum(totalSats(least), lang);
     perfectHtml = '<div class="kook-strike-potential">'+(lang==="es"
-      ? '⚡ <strong>¡Racha perfecta!</strong> Las '+NOTES.length+' salidas han recibido al menos un zap — todas, de la #'+firstId+' a la #'+lastId+'.<br>'+
+      ? '⚡ <strong>¡Racha perfecta!</strong> Las '+NOTES.length+' salidas han recibido al menos un zap. ¡Gracias Nostr!<br>'+
         outingLink(least,"es")+' es la menos zapeada, con solo '+ls+' sats. Si alguien la zapeara, le daría un empujón al proyecto.'
-      : '⚡ <strong>Perfect streak!</strong> All '+NOTES.length+' outings have been zapped — every single one, from #'+firstId+' to #'+lastId+'.<br>'+
+      : '⚡ <strong>Perfect streak!</strong> All '+NOTES.length+' outings have been zapped. Thank you, Nostr!<br>'+
         outingLink(least,"en")+' is the least zapped, with just '+ls+' sats. If someone zapped it, it would give the project a boost.'
     )+zapCta(least, lang)+'</div>';
   } else if (unzapped.length === 1) {
@@ -2023,6 +2028,7 @@ function render(lang) {
   document.getElementById("milestones").innerHTML=
     renderMilestone("🌅","Salidas","Outings",NOTES.length,HITOS.salidas,fmtNum,lang)+
     renderMilestone("⚡","Sats recibidos","Sats received",totalSatsAll,HITOS.sats,function(v){return fmtCompact(v,lang);},lang)+
+    renderMilestone("🧡","Zaps recibidos","Zaps received",totalZapsAll,HITOS.zaps,fmtNum,lang)+
     renderMilestone("👤","Zappers únicos","Unique zappers",zappersUnicos,HITOS.zappers,fmtNum,lang)+
     renderMilestone("💰","Bolsas de basura","Bags of trash",totalBags,HITOS.bags,function(v){return fmtBolsasNum(v);},lang)+
     renderMilestone("🪣","Litros de basura","Litres of trash",totalLiters,HITOS.liters,function(v){return fmtLitros(v,lang);},lang)+
