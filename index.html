@@ -371,15 +371,20 @@ html, body {
   margin-top: 10px;
   font-weight: 500;
 }
+/* Supporting metric under the label, split off by a thin line (same as the log cards) */
 .kook-trash .kook-stat-sublabel {
   display: block;
   font-family: var(--font-mono);
-  font-size: 0.65em;
-  letter-spacing: var(--letter-label);
-  color: #888;
-  margin-top: 4px;
+  font-size: 0.7em;
+  color: #8a8a8a;
+  margin-top: 8px;
+  padding-top: 7px;
+  border-top: 1px solid #2e2e2e;
+  line-height: 1.3;
   font-weight: 500;
+  white-space: nowrap;
 }
+.kook-trash .kook-stat-sublabel b { color: #cfcfcf; font-weight: 600; }
 .kook-trash .kook-milestones {
   margin: 24px 0;
   display: flex;
@@ -1925,10 +1930,8 @@ function render(lang) {
   document.getElementById("statSats").innerHTML=fmtNum(totalSatsAll)+'<span class="kook-stat-emoji">⚡</span>';
   // Per-month rates over the time elapsed since the project started.
   const months=Math.max(1,(Date.now()-Date.UTC(2026,4,1))/(864e5*365.25/12));
-  const perMonth=lang==="es"?"al mes":"per month";
-  const oPerM=(NOTES.length/months).toFixed(1);
-  document.getElementById("statOutingsMonth").textContent=(lang==="es"?oPerM.replace(".",","):oPerM)+" "+perMonth;
-  document.getElementById("statSatsMonth").textContent=fmtNum(Math.round(totalSatsAll/months),lang)+" "+perMonth;
+  document.getElementById("statOutingsMonth").innerHTML='<b>'+Math.round(NOTES.length/months)+'</b> '+(lang==="es"?"salidas/mes":"outings/month");
+  document.getElementById("statSatsMonth").innerHTML='<b>'+fmtNum(Math.round(totalSatsAll/months),lang)+'</b> '+(lang==="es"?"sats/mes":"sats/month");
 
   // Top zappers: two podiums — most sats, and most zaps.
   // Sorted copies; never sort fullRanking in place, the ranking list depends on its order.
