@@ -698,6 +698,13 @@ function noteUrl(eventId) { return "https://primal.net/e/"+eventId; }
 // original imageUrl (Blossom/Primal) via onerror.
 function localOutingImage(id) { return "images/outings/"+id+".jpg"; }
 function localSpotImage(spotId) { return "images/spots/"+spotId+".jpg"; }
+function localExtraImage(id) { return "images/no_notes/"+id+".jpg"; }
+function extraImgError(img) {
+  const fb = img.dataset.fallback;
+  if (fb && img.src !== fb) { img.src = fb; return; }
+  img.onerror = null;
+  img.outerHTML = '<div class="kook-feed-thumb-empty">📝</div>';
+}
 function shortNpub(npub) {
   if (!npub || npub.length < 20) return npub;
   return npub.slice(0,12)+"…"+npub.slice(-8);
@@ -1231,9 +1238,10 @@ function renderExtraNotes(lang) {
   feed.innerHTML = list.map(n => {
     const sats = totalSats(n);
     const dateStr = n.date ? fmtFecha(n.date, lang) : L.noDate;
-    const thumb = n.imageUrl
-      ? '<a href="'+noteUrl(n.eventId)+'" target="_blank" rel="noopener" class="kook-feed-thumb"><img src="'+escHtml(n.imageUrl)+'" alt="'+escHtml(L.alt+dateStr)+'" loading="lazy"></a>'
-      : '<a href="'+noteUrl(n.eventId)+'" target="_blank" rel="noopener" class="kook-feed-thumb"><div class="kook-feed-thumb-empty">📝</div></a>';
+    // Local copy first (images/no_notes/{id}.jpg), then the sheet's image_url,
+    // then the 📝 placeholder.
+    const thumb = '<a href="'+noteUrl(n.eventId)+'" target="_blank" rel="noopener" class="kook-feed-thumb">'+
+      '<img src="'+localExtraImage(n.id)+'" data-fallback="'+escHtml(n.imageUrl)+'" alt="'+escHtml(L.alt+dateStr)+'" loading="lazy" onerror="extraImgError(this)"></a>';
     const sortedZaps = [...n.zaps].sort((a,b)=>b.sats-a.sats);
     const avatars = sortedZaps.slice(0,5).map(z=>zapperAvatar(z.npub,22)).join("");
     const more = sortedZaps.length > 5 ? '<span class="kook-feed-num">+'+(sortedZaps.length-5)+'</span>' : '';
