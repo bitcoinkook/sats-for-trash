@@ -603,16 +603,6 @@ html, body {
     <h2 data-lang-en="">🏅 Records</h2>
     <div class="kook-log-best" id="bestGrid"></div>
 
-    <!-- OTHER ZAPPED NOTES (no_notes) -->
-    <div id="extraSection" style="display:none;">
-      <h2 data-lang-es="">📝 Registro de notas de satsfortrash zapeadas</h2>
-      <h2 data-lang-en="">📝 Log of zapped satsfortrash notes</h2>
-      <p data-lang-es="">Notas de satsfortrash que no son salidas pero han recibido zaps. Sus sats cuentan en los totales del proyecto.</p>
-      <p data-lang-en="">Satsfortrash notes that aren't outings but received zaps. Their sats count toward the project totals.</p>
-      <div class="kook-feed" id="extraFeed"></div>
-      <div class="kook-feed-summary" id="extraSummary"></div>
-    </div>
-
     <!-- OUTINGS FEED -->
     <h2 data-lang-es="">📋 Salidas</h2>
     <h2 data-lang-en="">📋 Outings</h2>
@@ -708,13 +698,6 @@ function noteUrl(eventId) { return "https://primal.net/e/"+eventId; }
 // original imageUrl (Blossom/Primal) via onerror.
 function localOutingImage(id) { return "images/outings/"+id+".jpg"; }
 function localSpotImage(spotId) { return "images/spots/"+spotId+".jpg"; }
-function localExtraImage(id) { return "images/no_notes/"+id+".jpg"; }
-function extraImgError(img) {
-  const fb = img.dataset.fallback;
-  if (fb && img.src !== fb) { img.src = fb; return; }
-  img.onerror = null;
-  img.outerHTML = '<div class="kook-feed-thumb-empty">📝</div>';
-}
 function shortNpub(npub) {
   if (!npub || npub.length < 20) return npub;
   return npub.slice(0,12)+"…"+npub.slice(-8);
@@ -898,13 +881,13 @@ async function loadData() {
   if (noNotesR.status==="fulfilled") {
     noNotesR.value.slice(1).forEach(r => {
       if (!r[0]||!r[2]) return;
-      const id=String(r[0]).trim(), eventId=String(r[2]).trim(), imageUrl=String(r[3]||"").trim();
+      const id=String(r[0]).trim(), eventId=String(r[2]).trim();
       const raw=zapsById[id]||[];
       const isoOk = d => /^\d{4}-\d{2}-\d{2}$/.test(d);
       let date=r[1] ? normalizaFecha(r[1]) : "";
       if (!isoOk(date)) date = raw.map(z=>z.zapDate).filter(isoOk).sort()[0] || "";
       const zaps=raw.map(z=>({npub:z.npub,sats:z.sats,zappedOuter:z.zappedOuter,date:isoOk(z.zapDate)?z.zapDate:date}));
-      EXTRA_NOTES.push({id,date,eventId,imageUrl,zaps});
+      EXTRA_NOTES.push({id,date,eventId,zaps});
     });
   }
 
@@ -1231,50 +1214,6 @@ function renderStats(lang) {
     (bestTime ? bestCard(R.time, bestTime.minutes+'min ⏱️', bestTime) : '');
 }
 
-// ── Other zapped notes (no_notes) ─────────────────────────────────────────
-function renderExtraNotes(lang) {
-  const section = document.getElementById("extraSection");
-  const feed = document.getElementById("extraFeed");
-  if (!section || !feed) return;
-  const list = EXTRA_NOTES.filter(n => n.zaps.length > 0);
-  section.style.display = list.length ? "block" : "none";
-  if (!list.length) return;
-  // Newest first; undated notes go last
-  list.sort((a,b) => (b.date||"").localeCompare(a.date||""));
-  const L = lang==="es"
-    ? { note:"nota", notes:"notas", zap:"zap", zaps:"zaps", view:"Ver nota", noDate:"sin fecha", alt:"Nota del " }
-    : { note:"note", notes:"notes", zap:"zap", zaps:"zaps", view:"View note", noDate:"no date", alt:"Note on " };
-
-  feed.innerHTML = list.map(n => {
-    const sats = totalSats(n);
-    const dateStr = n.date ? fmtFecha(n.date, lang) : L.noDate;
-    // Local copy first (images/no_notes/{id}.jpg), then the sheet's image_url,
-    // then the 📝 placeholder.
-    const thumb = '<a href="'+noteUrl(n.eventId)+'" target="_blank" rel="noopener" class="kook-feed-thumb">'+
-      '<img src="'+localExtraImage(n.id)+'" data-fallback="'+escHtml(n.imageUrl)+'" alt="'+escHtml(L.alt+dateStr)+'" loading="lazy" onerror="extraImgError(this)"></a>';
-    const sortedZaps = [...n.zaps].sort((a,b)=>b.sats-a.sats);
-    const avatars = sortedZaps.slice(0,5).map(z=>zapperAvatar(z.npub,22)).join("");
-    const more = sortedZaps.length > 5 ? '<span class="kook-feed-num">+'+(sortedZaps.length-5)+'</span>' : '';
-    return '<div class="kook-feed-row">'+
-      thumb+
-      '<div class="kook-feed-body">'+
-        '<div class="kook-feed-top"><span class="kook-feed-date">'+dateStr+'</span></div>'+
-        '<div class="kook-feed-meta"><span><strong>'+n.zaps.length+'</strong> '+(n.zaps.length===1?L.zap:L.zaps)+'</span></div>'+
-        '<div class="kook-feed-zapline"><span class="kook-feed-sats">'+fmtNum(sats)+' ⚡</span>'+
-          '<span class="kook-feed-avatars">'+avatars+'</span>'+more+'</div>'+
-      '</div>'+
-      '<a href="'+noteUrl(n.eventId)+'" target="_blank" rel="noopener" class="kook-feed-link" title="'+escHtml(L.view)+'">›</a>'+
-    '</div>';
-  }).join("");
-
-  const tSats = list.reduce((s,n)=>s+totalSats(n),0);
-  const tZaps = list.reduce((s,n)=>s+n.zaps.length,0);
-  document.getElementById("extraSummary").innerHTML =
-    '<strong>'+list.length+'</strong> '+(list.length===1?L.note:L.notes)+' · '+
-    '<strong>'+fmtNum(tSats)+'</strong> sats · '+
-    '<strong>'+tZaps+'</strong> '+(tZaps===1?L.zap:L.zaps);
-}
-
 // ── Filter + sort controls ────────────────────────────────────────────────
 function populateControls(lang) {
   // Spot dropdown
@@ -1473,7 +1412,6 @@ function render(lang) {
   currentLang = lang;
   renderStats(lang);
   populateControls(lang);
-  renderExtraNotes(lang);
   renderSpecialFinds(lang);
   renderSpots(lang);
   renderFeed(lang);

@@ -1120,6 +1120,31 @@ html, body {
     </div>
     <div class="kook-pagination" id="paginationNotas"></div>
 
+    <div id="extraSection" style="display:none;">
+    <h2 data-lang-es="">📝 Registro de notas de otras cosas</h2>
+    <h2 data-lang-en="">📝 Other stuff notes log</h2>
+    <p data-lang-es="">Notas de satsfortrash que no son salidas (pensamientos, comentarios) y han recibido zaps. Sus sats cuentan en los totales del proyecto.</p>
+    <p data-lang-en="">Satsfortrash notes that aren't outings (thoughts, comments) and received zaps. Their sats count toward the project totals.</p>
+    <div class="kook-table-wrap" id="extraLogAnchor">
+      <table class="kook-data">
+        <thead><tr>
+          <th><span data-lang-es="">Nota</span><span data-lang-en="">Note</span></th>
+          <th class="kook-num"><span data-lang-es="">Zappers</span><span data-lang-en="">Zappers</span></th>
+          <th class="kook-num"><span data-lang-es="">Zaps</span><span data-lang-en="">Zaps</span></th>
+          <th class="kook-num"><span data-lang-es="">Sats</span><span data-lang-en="">Sats</span></th>
+        </tr></thead>
+        <tbody id="extraBody"></tbody>
+        <tfoot><tr>
+          <td><span data-lang-es="">TOTAL</span><span data-lang-en="">TOTAL</span></td>
+          <td class="kook-num" id="footExtraZappers">—</td>
+          <td class="kook-num" id="footExtraZapCount">—</td>
+          <td class="kook-num" id="footExtraSats">—</td>
+        </tr></tfoot>
+      </table>
+    </div>
+    <div class="kook-pagination" id="paginationExtra"></div>
+    </div>
+
     <h2 data-lang-es="">🏔️ Hitos Actuales</h2>
     <h2 data-lang-en="">🏔️ Current Milestones</h2>
     <div class="kook-milestones" id="milestones"></div>
@@ -1161,7 +1186,9 @@ let currentLang = "en";
 let pageNotas = 0;
 let pageRankSats = 0;
 let pageGallery = 0;
+let pageExtra = 0;
 const PAGE_SIZE_GALLERY = 25;
+const PAGE_SIZE_EXTRA = 5;       // other stuff notes log page size
 const PAGE_SIZE = 10;            // ranking list page size
 const PAGE_SIZE_TABLE = 10;      // outings log page size
 
@@ -1605,8 +1632,9 @@ async function loadData() {
       const npub = String(r[1]).trim();
       const sats = parseInt(String(r[2]).replace(/[^\d-]/g, ""), 10) || 0;
       const zappedOuter = String(r[4] || "").trim();
+      const zapDate = r[3] ? normalizaFecha(r[3]) : "";
       if (!zapsById[idNote]) zapsById[idNote] = [];
-      zapsById[idNote].push({ npub, sats, zappedOuter });
+      zapsById[idNote].push({ npub, sats, zappedOuter, zapDate });
     }
   } else {
     showWarning(lang === "es"
@@ -1651,13 +1679,18 @@ async function loadData() {
     NOTES.push({ id, date, eventId, bags, imageUrl, spotId, outerId, minutes, zaps });
   }
 
-  // no_notes — non-critical; only the zaps matter on this page
+  // no_notes — non-critical. The note date comes from no_notes; if it's
+  // missing, the earliest zap_date from the Zaps tab stands in for it.
   EXTRA_NOTES = [];
   if (noNotesResult.status === "fulfilled") {
+    const isoOk = d => /^\d{4}-\d{2}-\d{2}$/.test(d);
     noNotesResult.value.slice(1).forEach(r => {
       if (!r[0] || !r[2]) return;
       const id = String(r[0]).trim();
-      EXTRA_NOTES.push({ id, eventId: String(r[2]).trim(), zaps: zapsById[id] || [] });
+      const zaps = zapsById[id] || [];
+      let date = r[1] ? normalizaFecha(r[1]) : "";
+      if (!isoOk(date)) date = zaps.map(z => z.zapDate).filter(isoOk).sort()[0] || "";
+      EXTRA_NOTES.push({ id, date, eventId: String(r[2]).trim(), zaps });
     });
   }
 
@@ -1696,6 +1729,8 @@ function scrollToAnchor(id) {
 }
 function prevNotas(){if(pageNotas>0){pageNotas--;renderTabla(currentLang);scrollToAnchor("outingsLogAnchor");}}
 function nextNotas(){pageNotas++;renderTabla(currentLang);scrollToAnchor("outingsLogAnchor");}
+function prevExtra(){if(pageExtra>0){pageExtra--;renderExtraTabla(currentLang);scrollToAnchor("extraLogAnchor");}}
+function nextExtra(){pageExtra++;renderExtraTabla(currentLang);scrollToAnchor("extraLogAnchor");}
 function prevRankSats(){if(pageRankSats>0){pageRankSats--;renderRankings(currentLang);scrollToAnchor("rankingAnchor");}}
 function nextRankSats(){pageRankSats++;renderRankings(currentLang);scrollToAnchor("rankingAnchor");}
 
@@ -1828,6 +1863,42 @@ function renderTabla(lang) {
     body.appendChild(tr);
   });
   renderPagination("paginationNotas",pageNotas,ordenadas.length,"prevNotas","nextNotas",lang,PAGE_SIZE_TABLE);
+}
+
+// Other stuff notes log — non-outing notes that received zaps. Same layout as
+// the mini log, without the bags column.
+function renderExtraTabla(lang) {
+  const section=document.getElementById("extraSection");
+  const body=document.getElementById("extraBody");
+  if (!section || !body) return;
+  const list=EXTRA_NOTES.filter(n=>n.zaps.length>0).sort((a,b)=>{
+    const cmp=(b.date||"").localeCompare(a.date||"");   // undated last
+    return cmp!==0?cmp:String(b.id).localeCompare(String(a.id),undefined,{numeric:true});
+  });
+  section.style.display=list.length?"block":"none";
+  if (!list.length) return;
+  const totalPages=Math.ceil(list.length/PAGE_SIZE_EXTRA);
+  if (pageExtra>totalPages-1) pageExtra=totalPages-1;
+  body.innerHTML="";
+  list.slice(pageExtra*PAGE_SIZE_EXTRA,(pageExtra+1)*PAGE_SIZE_EXTRA).forEach(n=>{
+    const sortedZaps=[...n.zaps].sort((a,b)=>b.sats-a.sats);
+    const rows=sortedZaps.map(z=>
+      '<span class="kook-zap-name">'+zapperLink(z.npub)+'</span>'+
+      '<span class="kook-zap-amt">'+fmtNum(z.sats)+'</span>'
+    ).join("");
+    const dateStr=n.date?fmtFecha(n.date,lang):"—";
+    const tr=document.createElement("tr");
+    tr.innerHTML=
+      '<td class="kook-outing-cell"><a class="kook-date" href="'+noteUrl(n.eventId)+'" target="_blank" rel="noopener">'+dateStr+' ↗</a>'+
+      '<span class="kook-outing-id">#'+escHtml(n.id)+'</span></td>'+
+      '<td colspan="2" class="kook-zap-merged-cell"><div class="kook-zap-merged">'+rows+'</div></td>'+
+      '<td class="kook-num kook-sats-total">'+fmtNum(totalSats(n))+'</td>';
+    body.appendChild(tr);
+  });
+  renderPagination("paginationExtra",pageExtra,list.length,"prevExtra","nextExtra",lang,PAGE_SIZE_EXTRA);
+  document.getElementById("footExtraZappers").textContent=new Set(list.flatMap(n=>n.zaps.map(z=>z.npub))).size;
+  document.getElementById("footExtraZapCount").textContent=list.reduce((s,n)=>s+n.zaps.length,0);
+  document.getElementById("footExtraSats").textContent=fmtNum(list.reduce((s,n)=>s+totalSats(n),0));
 }
 
 function renderGallery(lang) {
@@ -2069,6 +2140,7 @@ function render(lang) {
   document.getElementById("lastNote").innerHTML = lastText + lastPhoto;
 
   renderTabla(lang);
+  renderExtraTabla(lang);
   renderGallery(lang);
   renderOuters(lang);
   renderRankings(lang, fullRanking);
