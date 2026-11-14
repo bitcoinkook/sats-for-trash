@@ -911,8 +911,8 @@ html, body {
   <h1 data-lang-en=""><span class="kook-title-accent">Sats</span> for Trash</h1>
   <span class="kook-kicker" data-lang-es="">Bitcoin · Nostr · Acción Local</span>
   <span class="kook-kicker" data-lang-en="">Bitcoin · Nostr · Local Action</span>
-  <p class="kook-positioning" data-lang-es="">Limpiando playas y espacios naturales. Documentado en Nostr. Impulsado por zaps.</p>
-  <p class="kook-positioning" data-lang-en="">Cleaning up beaches and natural spaces. Documented on Nostr. Fueled by zaps.</p>
+  <p class="kook-positioning" data-lang-es="">Limpiando el entorno. Documentado en Nostr. Impulsado por zaps.</p>
+  <p class="kook-positioning" data-lang-en="">Cleaning Up the Environment. Documented on Nostr. Fueled by Zaps.</p>
 
   <div data-lang-es="">
     <button class="kook-manifesto-toggle" id="toggleNormieEs" onclick="toggleNormie('es')">► ¿Primera vez aquí? Qué es Nostr, los sats y los zaps</button>
@@ -1003,8 +1003,8 @@ html, body {
     <div id="outersSection" style="display:none;">
     <h2 data-lang-es="">🧹 Top Colaboradores</h2>
     <h2 data-lang-en="">🧹 Top Contributors</h2>
-    <p data-lang-es="">Las personas que salen a limpiar y publican notas en Nostr. Cada salida documentada, cada bolsa recogida, cuenta.</p>
-    <p data-lang-en="">The people who go out, clean up, and post notes on Nostr. Every documented outing, every bag collected, counts.</p>
+    <p data-lang-es="">Las personas que salen a limpiar y publican notas sobre ello en Nostr.</p>
+    <p data-lang-en="">The people who go out, clean up and post notes about it on Nostr.</p>
     <div class="kook-ranking" id="outersList"></div>
     <div class="kook-become-outer">
       <button class="kook-manifesto-toggle" data-lang-es="" id="toggleBecomeEs" onclick="toggleBecome('es')">► Cómo convertirse en Colaborador</button>
@@ -1095,10 +1095,10 @@ html, body {
     </div>
     <div class="kook-pagination" id="paginationRankingSats"></div>
 
-    <h2 data-lang-es="">📋 Mini registro</h2>
-    <h2 data-lang-en="">📋 Mini log</h2>
-    <p data-lang-es="">Las últimas salidas de un vistazo. El <a href="log.html">registro completo</a> tiene todas las salidas, estadísticas y spots.</p>
-    <p data-lang-en="">The most recent outings at a glance. The <a href="log.html">full log</a> has every outing, stats and spots.</p>
+    <h2 data-lang-es="">📋 Registro de salidas</h2>
+    <h2 data-lang-en="">📋 Outings log</h2>
+    <p data-lang-es="">Un registro de todas las salidas con bolsas, zappers y zaps. El <a href="log.html">registro completo</a> ofrece más información para las mentes curiosas.</p>
+    <p data-lang-en="">A record of all the outings including bags, zappers and zaps. The <a href="log.html">full log</a> provides more information for the curious mind.</p>
     <div class="kook-table-wrap" id="outingsLogAnchor">
       <table class="kook-data">
         <thead><tr>
@@ -1684,13 +1684,18 @@ async function loadData() {
   EXTRA_NOTES = [];
   if (noNotesResult.status === "fulfilled") {
     const isoOk = d => /^\d{4}-\d{2}-\d{2}$/.test(d);
+    // Contributor column found by name (any header containing "outer"), so it
+    // can sit anywhere in the no_notes tab.
+    const headerX = (noNotesResult.value[0] || []).map(h => String(h || "").trim().toLowerCase());
+    const outerIdx = headerX.findIndex(h => h.indexOf("outer") !== -1);
     noNotesResult.value.slice(1).forEach(r => {
       if (!r[0] || !r[2]) return;
       const id = String(r[0]).trim();
       const zaps = zapsById[id] || [];
       let date = r[1] ? normalizaFecha(r[1]) : "";
       if (!isoOk(date)) date = zaps.map(z => z.zapDate).filter(isoOk).sort()[0] || "";
-      EXTRA_NOTES.push({ id, date, eventId: String(r[2]).trim(), zaps });
+      const outerId = outerIdx !== -1 ? String(r[outerIdx] || "").trim() : "";
+      EXTRA_NOTES.push({ id, date, eventId: String(r[2]).trim(), outerId, zaps });
     });
   }
 
@@ -1757,17 +1762,21 @@ function renderOuters(lang) {
 
   // Aggregate per outer id
   const outings = {}, bags = {}, sats = {}, zaps = {};
+  // A zap belongs to whoever posted the outing it landed on (the note's
+  // id_outer column), so sats follow the outing, not the Zaps tab.
   NOTES.forEach(n => {
     if (!n.outerId) return;
     outings[n.outerId] = (outings[n.outerId] || 0) + 1;
     bags[n.outerId]    = (bags[n.outerId]    || 0) + n.bags;
+    sats[n.outerId]    = (sats[n.outerId]    || 0) + totalSats(n);
+    zaps[n.outerId]    = (zaps[n.outerId]    || 0) + n.zaps.length;
   });
-  NOTES.forEach(n => {
-    n.zaps.forEach(z => {
-      if (!z.zappedOuter) return;
-      sats[z.zappedOuter] = (sats[z.zappedOuter] || 0) + z.sats;
-      zaps[z.zappedOuter] = (zaps[z.zappedOuter] || 0) + 1;
-    });
+  // Zapped non-outing notes count toward their contributor's sats and zaps
+  // (not toward outings or bags).
+  EXTRA_NOTES.forEach(n => {
+    if (!n.outerId) return;
+    sats[n.outerId] = (sats[n.outerId] || 0) + totalSats(n);
+    zaps[n.outerId] = (zaps[n.outerId] || 0) + n.zaps.length;
   });
 
   // Sort by sats desc, fall back to outings
