@@ -574,16 +574,6 @@ html, body {
     <p data-lang-es="" class="kook-log-intro">Todas las limpiezas quedan registradas aquí, con información sobre bolsas, tiempo, zaps... y también algunas estadísticas para los curiosos.</p>
     <p data-lang-en="" class="kook-log-intro">All the cleanups are recorded here, including information on bags, time, zaps... also some stats for the curious user.</p>
 
-    <!-- TRASH STATS -->
-    <h2 data-lang-es="">🗑️ Basura</h2>
-    <h2 data-lang-en="">🗑️ Trash</h2>
-    <div class="kook-headline-stats" id="trashStats"></div>
-    <div class="kook-charts">
-      <div class="kook-chart" id="chartBags"></div>
-      <div class="kook-chart" id="chartOutings"></div>
-    </div>
-    <p class="kook-chart-note" id="trashChartNote"></p>
-
     <!-- SATS STATS -->
     <h2 data-lang-es="">⚡ Sats</h2>
     <h2 data-lang-en="">⚡ Sats</h2>
@@ -597,6 +587,16 @@ html, body {
       <div class="kook-chart" id="chartZaps"></div>
     </div>
     <p class="kook-chart-note" id="satsChartNote"></p>
+
+    <!-- TRASH STATS -->
+    <h2 data-lang-es="">🗑️ Basura</h2>
+    <h2 data-lang-en="">🗑️ Trash</h2>
+    <div class="kook-headline-stats" id="trashStats"></div>
+    <div class="kook-charts">
+      <div class="kook-chart" id="chartBags"></div>
+      <div class="kook-chart" id="chartOutings"></div>
+    </div>
+    <p class="kook-chart-note" id="trashChartNote"></p>
 
     <!-- RECORDS -->
     <h2 data-lang-es="">🏅 Récords</h2>
@@ -634,8 +634,8 @@ html, body {
 
     <!-- SPECIAL FINDS -->
     <div id="specialSection" style="display:none;">
-      <h2 data-lang-es="">🔎 Hallazgos especiales</h2>
-      <h2 data-lang-en="">🔎 Special finds</h2>
+      <h2 data-lang-es="">🔎 Hallazgos Especiales</h2>
+      <h2 data-lang-en="">🔎 Special Findings</h2>
       <p data-lang-es="">Cosas que no son basura corriente. Pulsa una foto para ver la nota de esa salida.</p>
       <p data-lang-en="">Things that aren't ordinary litter. Tap a photo to see that outing's note.</p>
       <div class="kook-finds" id="specialList"></div>
@@ -1234,9 +1234,9 @@ function populateControls(lang) {
   if (sortSel) {
     const opts = lang==="es"
       ? [["newest","Más recientes"],["oldest","Más antiguas"],
-         ["sats","Más sats"],["bags","Más bolsas"],["time","Más tiempo"]]
+         ["sats","Más sats"],["zaps","Más zaps"],["bags","Más bolsas"],["time","Más tiempo"]]
       : [["newest","Newest first"],["oldest","Oldest first"],
-         ["sats","Most sats"],["bags","Most bags"],["time","Longest"]];
+         ["sats","Most sats"],["zaps","Most zaps"],["bags","Most bags"],["time","Longest"]];
     sortSel.innerHTML = opts.map(([v,l]) =>
       '<option value="'+v+'"'+(activeSort===v?' selected':'')+'>'+l+'</option>').join("");
   }
@@ -1313,6 +1313,7 @@ function renderFeed(lang) {
     newest: byDateDesc,
     oldest: (a,b) => -byDateDesc(a,b),
     sats:   (a,b) => totalSats(b)-totalSats(a) || byDateDesc(a,b),
+    zaps:   (a,b) => b.zaps.length-a.zaps.length || byDateDesc(a,b),
     bags:   (a,b) => b.bags-a.bags || byDateDesc(a,b),
     time:   (a,b) => (b.minutes||0)-(a.minutes||0) || byDateDesc(a,b)
   };

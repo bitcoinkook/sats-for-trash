@@ -529,6 +529,46 @@ html, body {
   margin-top: 2px;
 }
 .kook-trash table.kook-data tfoot .kook-outing-id { color: #fff; opacity: 0.85; }
+/* Outings log filter + sort controls — same as the log page */
+.kook-trash .kook-controls {
+  display: flex;
+  gap: 10px;
+  margin: 16px 0 14px 0;
+  flex-wrap: wrap;
+}
+.kook-trash .kook-control {
+  flex: 1;
+  min-width: 140px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.kook-trash .kook-control-label {
+  font-family: var(--font-sans);
+  font-size: var(--text-label);
+  letter-spacing: var(--letter-label);
+  text-transform: uppercase;
+  color: #999;
+  font-weight: 600;
+}
+.kook-trash .kook-control select {
+  font-family: var(--font-sans);
+  font-size: var(--text-meta);
+  color: #333;
+  padding: 8px 10px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  background: #fff;
+  cursor: pointer;
+  width: 100%;
+  appearance: none;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='2'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 8px center;
+  background-size: 16px;
+  padding-right: 30px;
+}
+.kook-trash .kook-control select:focus { outline: none; border-color: var(--brand-orange); }
 /* Merged zappers+zaps cell — internal grid keeps name and amount on the same physical
    line per zap, so wrapping a long name pushes its amount with it. */
 .kook-trash table.kook-data .kook-zap-merged-cell {
@@ -955,8 +995,8 @@ html, body {
 
   <div id="content" style="display: none;">
 
-    <h2 data-lang-es="">📍 La última salida</h2>
-    <h2 data-lang-en="">📍 Latest outing</h2>
+    <h2 data-lang-es="">📍 La Última Salida</h2>
+    <h2 data-lang-en="">📍 Latest Outing</h2>
     <div class="kook-last-note" id="lastNote"></div>
 
     <h2 data-lang-es="">📊 Hasta Hoy — Desde el 01/05/2026</h2>
@@ -983,8 +1023,8 @@ html, body {
       </div>
     </div>
 
-    <h2 data-lang-es="">⚡ Top zappers</h2>
-    <h2 data-lang-en="">⚡ Top zappers</h2>
+    <h2 data-lang-es="">⚡ Top Zappers</h2>
+    <h2 data-lang-en="">⚡ Top Zappers</h2>
     <p data-lang-es="">Las personas que apoyan el proyecto económicamente. Los sats ⚡ son lo que envían; los puntos ⭐ suben cuanto más a menudo zapean.</p>
     <p data-lang-en="">The people supporting the project economically. Sats ⚡ are what they send; points ⭐ climb the more often they zap.</p>
     <div class="kook-duo">
@@ -1036,7 +1076,7 @@ html, body {
           ⚠️ <strong>Aviso de custodia.</strong> La persona que gestiona satsfortrash.com decide qué entradas aparecen aquí y podría dejar de mantener el sitio en cualquier momento. Tus notas, tus claves de Bitcoin y Nostr son siempre tuyas — nadie tiene acceso a ellas, pero la información de este sitio no está bajo tu control. Si la dependencia de un tercero es un problema, monta tu propia instancia.
         </p>
         <p data-lang-es="" style="background:#fffbe6;border-left:3px solid #c90;padding:10px 14px;border-radius:0 4px 4px 0;font-family:var(--font-sans);font-size:var(--text-meta);color:#665500;line-height:1.6;">
-          ⚠️ <strong>Esto es experimental.</strong> Mientras el número de Colaboradores sea pequeño, podemos gestionar las entradas manualmente sin problema. Si de repente llegan muchas notas a la vez, no podemos garantizar que las añadamos todas ni a tiempo. Es una limitación real, no una promesa vacía.
+          ⚠️ <strong>Esto es experimental.</strong> Mientras el número de Colaboradores sea pequeño, podemos gestionar las entradas manualmente sin problema. Si de repente llegan muchas notas a la vez, no podemos garantizar que las añadamos todas ni a tiempo.
         </p>
       </div>
       <div class="kook-manifesto-content" id="becomeEn">
@@ -1066,7 +1106,7 @@ html, body {
           ⚠️ <strong>Custody notice.</strong> The person who manages satsfortrash.com controls what entries appear here and could stop maintaining the site at any time. Your notes, and your Bitcoin and Nostr keys are always yours — no one has access to them, but the information on this site isn't under your control. If depending on a third party is a concern, run your own instance.
         </p>
         <p data-lang-en="" style="background:#fffbe6;border-left:3px solid #c90;padding:10px 14px;border-radius:0 4px 4px 0;font-family:var(--font-sans);font-size:var(--text-meta);color:#665500;line-height:1.6;">
-          ⚠️ <strong>This is experimental.</strong> While the number of Contributors stays small, we can manage entries manually without issue. If many notes arrive at once, we can't guarantee we'll add all of them or do it quickly. That's a real limitation, not a disclaimer.
+          ⚠️ <strong>This is experimental.</strong> While the number of Contributors stays small, we can manage entries manually without issue. If many notes arrive at once, we can't guarantee we'll add all of them or do it quickly.
         </p>
       </div>
     </div>
@@ -1084,8 +1124,8 @@ html, body {
     <div class="kook-gallery" id="gallery"></div>
     <div class="kook-pagination" id="paginationGallery"></div>
 
-    <h2 data-lang-es="">🏆 Ranking de zappers</h2>
-    <h2 data-lang-en="">🏆 Zapper ranking</h2>
+    <h2 data-lang-es="">🏆 Ranking de Zappers</h2>
+    <h2 data-lang-en="">🏆 Zapper Ranking</h2>
     <div class="kook-ranking" id="rankingAnchor">
       <span class="kook-section-label" data-lang-es="">⚡ Puntuación combinada · Sats + Fidelidad</span>
       <span class="kook-section-label" data-lang-en="">⚡ Combined score · Sats + Loyalty</span>
@@ -1095,10 +1135,22 @@ html, body {
     </div>
     <div class="kook-pagination" id="paginationRankingSats"></div>
 
-    <h2 data-lang-es="">📋 Registro de salidas</h2>
-    <h2 data-lang-en="">📋 Outings log</h2>
+    <h2 data-lang-es="">📋 Registro de Salidas</h2>
+    <h2 data-lang-en="">📋 Outings Log</h2>
     <p data-lang-es="">Un registro de todas las salidas con bolsas, zappers y zaps. El <a href="log.html">registro completo</a> ofrece más información para las mentes curiosas.</p>
     <p data-lang-en="">A record of all the outings including bags, zappers and zaps. The <a href="log.html">full log</a> provides more information for the curious mind.</p>
+    <div class="kook-controls">
+      <label class="kook-control">
+        <span class="kook-control-label" data-lang-es="">Colaborador</span>
+        <span class="kook-control-label" data-lang-en="">Contributor</span>
+        <select id="outerSelect" onchange="onOuterChange()"></select>
+      </label>
+      <label class="kook-control">
+        <span class="kook-control-label" data-lang-es="">Orden</span>
+        <span class="kook-control-label" data-lang-en="">Sort</span>
+        <select id="sortSelect" onchange="onSortChange()"></select>
+      </label>
+    </div>
     <div class="kook-table-wrap" id="outingsLogAnchor">
       <table class="kook-data">
         <thead><tr>
@@ -1121,8 +1173,8 @@ html, body {
     <div class="kook-pagination" id="paginationNotas"></div>
 
     <div id="extraSection" style="display:none;">
-    <h2 data-lang-es="">📝 Registro de notas de otras cosas</h2>
-    <h2 data-lang-en="">📝 Other stuff notes log</h2>
+    <h2 data-lang-es="">📝 Registro de Notas de Otras Cosas</h2>
+    <h2 data-lang-en="">📝 Other Stuff Notes Log</h2>
     <p data-lang-es="">Notas de satsfortrash que no son salidas (pensamientos, comentarios) y han recibido zaps. Sus sats cuentan en los totales del proyecto.</p>
     <p data-lang-en="">Satsfortrash notes that aren't outings (thoughts, comments) and received zaps. Their sats count toward the project totals.</p>
     <div class="kook-table-wrap" id="extraLogAnchor">
@@ -1149,8 +1201,8 @@ html, body {
     <h2 data-lang-en="">🏔️ Current Milestones</h2>
     <div class="kook-milestones" id="milestones"></div>
 
-    <h2 data-lang-es="">🛠️ Apoya el trabajo</h2>
-    <h2 data-lang-en="">🛠️ Support the work</h2>
+    <h2 data-lang-es="">🛠️ Apoya el Trabajo</h2>
+    <h2 data-lang-en="">🛠️ Support the Work</h2>
     <div class="kook-support">
       <p data-lang-es="">Si esto te resulta útil, hay varias formas de ayudar — cualquiera vale:</p>
       <p data-lang-en="">If this is useful to you, there are a few ways to help — any of them counts:</p>
@@ -1838,13 +1890,61 @@ function renderOuters(lang) {
   el.innerHTML = '<ol class="kook-ranking-ol" style="list-style:none;margin:8px 0 0 0;padding-left:4px;">'+items+'</ol>';
 }
 
+// ── Outings log filter + sort (same options as the log page) ──
+let activeOuterFilter = null; // null = all contributors
+let activeSort = "newest";
+function populateTablaControls(lang) {
+  const outerSel = document.getElementById("outerSelect");
+  if (outerSel) {
+    const counts = {};
+    NOTES.forEach(n => { if (n.outerId) counts[n.outerId] = (counts[n.outerId]||0)+1; });
+    const ids = Object.keys(counts).sort((a,b)=>counts[b]-counts[a]);
+    const allLabel = lang==="es" ? "Todos los colaboradores" : "All contributors";
+    outerSel.innerHTML =
+      '<option value="">'+allLabel+' ('+NOTES.length+')</option>' +
+      ids.map(id => '<option value="'+escHtml(id)+'"'+(activeOuterFilter===id?' selected':'')+'>'+
+        escHtml((OUTERS[id]&&OUTERS[id].displayName)||("#"+id))+' ('+counts[id]+')</option>').join("");
+  }
+  const sortSel = document.getElementById("sortSelect");
+  if (sortSel) {
+    const opts = lang==="es"
+      ? [["newest","Más recientes"],["oldest","Más antiguas"],
+         ["sats","Más sats"],["zaps","Más zaps"],["bags","Más bolsas"],["time","Más tiempo"]]
+      : [["newest","Newest first"],["oldest","Oldest first"],
+         ["sats","Most sats"],["zaps","Most zaps"],["bags","Most bags"],["time","Longest"]];
+    sortSel.innerHTML = opts.map(([v,l]) =>
+      '<option value="'+v+'"'+(activeSort===v?' selected':'')+'>'+l+'</option>').join("");
+  }
+}
+function onOuterChange() {
+  activeOuterFilter = document.getElementById("outerSelect").value || null;
+  pageNotas = 0;
+  renderTabla(currentLang);
+}
+function onSortChange() {
+  activeSort = document.getElementById("sortSelect").value;
+  pageNotas = 0;
+  renderTabla(currentLang);
+}
+
 function renderTabla(lang) {
   const body=document.getElementById("dataBody");
   if (!body) return;
-  const ordenadas=[...NOTES].sort((a,b)=>{
+  populateTablaControls(lang);
+  const source = activeOuterFilter ? NOTES.filter(n => n.outerId === activeOuterFilter) : NOTES;
+  const byDateDesc = (a,b) => {
     const cmp=b.date.localeCompare(a.date);
     return cmp!==0?cmp:parseInt(b.id)-parseInt(a.id);
-  });
+  };
+  const sorters = {
+    newest: byDateDesc,
+    oldest: (a,b) => -byDateDesc(a,b),
+    sats:   (a,b) => totalSats(b)-totalSats(a) || byDateDesc(a,b),
+    zaps:   (a,b) => b.zaps.length-a.zaps.length || byDateDesc(a,b),
+    bags:   (a,b) => b.bags-a.bags || byDateDesc(a,b),
+    time:   (a,b) => (b.minutes||0)-(a.minutes||0) || byDateDesc(a,b)
+  };
+  const ordenadas=[...source].sort(sorters[activeSort] || byDateDesc);
   body.innerHTML="";
   ordenadas.slice(pageNotas*PAGE_SIZE_TABLE,(pageNotas+1)*PAGE_SIZE_TABLE).forEach(n=>{
     const sats=totalSats(n);
@@ -1862,16 +1962,23 @@ function renderTabla(lang) {
       ).join("");
       zapMergedCell = '<td colspan="2" class="kook-zap-merged-cell"><div class="kook-zap-merged">'+rows+'</div></td>';
     }
+    const o=OUTERS[n.outerId];
+    const outerName=(o&&o.displayName)?' · '+escHtml(o.displayName):'';
     const tr=document.createElement("tr");
     tr.innerHTML=
       '<td class="kook-outing-cell"><a class="kook-date" href="'+noteUrl(n.eventId)+'" target="_blank" rel="noopener">'+fmtFecha(n.date,lang)+' ↗</a>'+
-      '<span class="kook-outing-id">#'+n.id+'</span></td>'+
+      '<span class="kook-outing-id">#'+n.id+outerName+'</span></td>'+
       '<td class="kook-num">'+fmtBolsas2(n.bags,lang)+'</td>'+
       zapMergedCell+
       '<td class="kook-num kook-sats-total">'+fmtNum(sats)+'</td>';
     body.appendChild(tr);
   });
   renderPagination("paginationNotas",pageNotas,ordenadas.length,"prevNotas","nextNotas",lang,PAGE_SIZE_TABLE);
+  // Footer follows the contributor filter (outings only)
+  document.getElementById("footBags").textContent=fmtBolsasNum(source.reduce((t,n)=>t+n.bags,0));
+  document.getElementById("footSats").textContent=fmtNum(source.reduce((t,n)=>t+totalSats(n),0));
+  document.getElementById("footZappers").textContent=new Set(source.flatMap(n=>n.zaps.map(z=>z.npub))).size;
+  document.getElementById("footZapCount").textContent=source.reduce((t,n)=>t+n.zaps.length,0);
 }
 
 // Other stuff notes log — non-outing notes that received zaps. Same layout as
@@ -2154,13 +2261,6 @@ function render(lang) {
   renderOuters(lang);
   renderRankings(lang, fullRanking);
 
-  if (document.getElementById("footBags")) {
-    document.getElementById("footBags").textContent=fmtBolsasNum(totalBags);
-    document.getElementById("footSats").textContent=fmtNum(totalSatsOutings);
-  }
-  // Mini log footer covers outings only
-  document.getElementById("footZappers").textContent=new Set(NOTES.flatMap(n=>n.zaps.map(z=>z.npub))).size;
-  document.getElementById("footZapCount").textContent=NOTES.reduce((s,n)=>s+n.zaps.length,0);
 }
 
 function setLang(lang) {
