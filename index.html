@@ -1981,6 +1981,13 @@ function renderTabla(lang) {
   document.getElementById("footZapCount").textContent=source.reduce((t,n)=>t+n.zaps.length,0);
 }
 
+// no_notes ids start at 9001 in the sheet; display them counting from 1
+// (9003 → 3, 9100 → 100). Non-numeric ids are shown as they are.
+function shortNoteId(id) {
+  const n = parseInt(id, 10);
+  return (String(n) === String(id).trim() && n > 9000) ? String(n - 9000) : String(id);
+}
+
 // Other stuff notes log — non-outing notes that received zaps. Same layout as
 // the mini log, without the bags column.
 function renderExtraTabla(lang) {
@@ -2006,7 +2013,7 @@ function renderExtraTabla(lang) {
     const tr=document.createElement("tr");
     tr.innerHTML=
       '<td class="kook-outing-cell"><a class="kook-date" href="'+noteUrl(n.eventId)+'" target="_blank" rel="noopener">'+dateStr+' ↗</a>'+
-      '<span class="kook-outing-id">#'+escHtml(n.id)+'</span></td>'+
+      '<span class="kook-outing-id">#'+escHtml(shortNoteId(n.id))+'</span></td>'+
       '<td colspan="2" class="kook-zap-merged-cell"><div class="kook-zap-merged">'+rows+'</div></td>'+
       '<td class="kook-num kook-sats-total">'+fmtNum(totalSats(n))+'</td>';
     body.appendChild(tr);
