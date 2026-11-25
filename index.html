@@ -1665,22 +1665,20 @@ function renderBtcValue(lang) {
   if (!el || TOTAL_SATS_ALL === null) return;
   const btc = TOTAL_SATS_ALL / 1e8;
   const es = lang === "es";
-  const satsTxt = fmtNum(TOTAL_SATS_ALL,lang)+(es ? " sats recogidos = " : " sats collected = ");
-  const line1 = (es ? "1 BTC el 01/05/2026: " : "1 BTC on May 1, 2026: ")+"<b>"+fmtUsd(BTC_USD_START,lang)+"</b> · "+
-                satsTxt+"<b>"+fmtUsd(btc*BTC_USD_START,lang)+"</b>";
-  let line2;
+  const head = (es ? "Si hubieras comprado " : "If you'd bought ")+fmtNum(TOTAL_SATS_ALL,lang)+
+               (es ? " sats el 1 de mayo de 2026 por " : " sats on May 1, 2026 for ")+
+               "<b>"+fmtUsd(btc*BTC_USD_START,lang)+"</b>"+(es ? ", hoy valdrían " : ", today they'd be worth ");
+  let tail;
   if (BTC_USD_NOW) {
     // Green when above the May 1 price, red when below.
     const pct = (BTC_USD_NOW/BTC_USD_START-1)*100;
     const cls = pct >= 0 ? "kook-btc-up" : "kook-btc-down";
     const pctTxt = (pct>=0?"+":"")+pct.toLocaleString(es?"es-ES":"en-US",{minimumFractionDigits:1,maximumFractionDigits:1})+"%";
-    line2 = (es ? "1 BTC hoy: " : "1 BTC today: ")+
-            '<b class="'+cls+'">'+fmtUsd(BTC_USD_NOW,lang)+" ("+pctTxt+")</b> · "+
-            satsTxt+'<b class="'+cls+'">'+fmtUsd(btc*BTC_USD_NOW,lang)+"</b>";
+    tail = '<b class="'+cls+'">'+fmtUsd(btc*BTC_USD_NOW,lang)+" ("+pctTxt+")</b>.";
   } else {
-    line2 = (es ? "1 BTC hoy: " : "1 BTC today: ")+(btcNowFailed ? (es ? "no disponible" : "unavailable") : "…");
+    tail = btcNowFailed ? (es ? "… (precio no disponible)." : "… (price unavailable).") : "…";
   }
-  el.innerHTML = line1+"<br>"+line2;
+  el.innerHTML = head+tail;
 }
 // Live price: mempool.space first, CoinGecko as fallback. No API keys needed.
 async function loadBtcPrice() {
