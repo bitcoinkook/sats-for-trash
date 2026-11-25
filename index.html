@@ -221,6 +221,8 @@ html, body {
   margin: -8px 0 24px 0;
 }
 .kook-trash .kook-btc-value b { color: #222; }
+.kook-trash .kook-btc-value b.kook-btc-up { color: #1a8a3a; }
+.kook-trash .kook-btc-value b.kook-btc-down { color: #c62828; }
 .kook-trash .kook-podium {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -1663,12 +1665,18 @@ function renderBtcValue(lang) {
   if (!el || TOTAL_SATS_ALL === null) return;
   const btc = TOTAL_SATS_ALL / 1e8;
   const es = lang === "es";
+  const satsTxt = fmtNum(TOTAL_SATS_ALL,lang)+(es ? " sats recogidos = " : " sats collected = ");
   const line1 = (es ? "1 BTC el 01/05/2026: " : "1 BTC on May 1, 2026: ")+"<b>"+fmtUsd(BTC_USD_START,lang)+"</b> · "+
-                (es ? "valor de los sats: " : "sats value: ")+"<b>"+fmtUsd(btc*BTC_USD_START,lang)+"</b>";
+                satsTxt+"<b>"+fmtUsd(btc*BTC_USD_START,lang)+"</b>";
   let line2;
   if (BTC_USD_NOW) {
-    line2 = (es ? "1 BTC hoy: " : "1 BTC today: ")+"<b>"+fmtUsd(BTC_USD_NOW,lang)+"</b> · "+
-            (es ? "valor de los sats: " : "sats value: ")+"<b>"+fmtUsd(btc*BTC_USD_NOW,lang)+"</b>";
+    // Green when above the May 1 price, red when below.
+    const pct = (BTC_USD_NOW/BTC_USD_START-1)*100;
+    const cls = pct >= 0 ? "kook-btc-up" : "kook-btc-down";
+    const pctTxt = (pct>=0?"+":"")+pct.toLocaleString(es?"es-ES":"en-US",{minimumFractionDigits:1,maximumFractionDigits:1})+"%";
+    line2 = (es ? "1 BTC hoy: " : "1 BTC today: ")+
+            '<b class="'+cls+'">'+fmtUsd(BTC_USD_NOW,lang)+" ("+pctTxt+")</b> · "+
+            satsTxt+'<b class="'+cls+'">'+fmtUsd(btc*BTC_USD_NOW,lang)+"</b>";
   } else {
     line2 = (es ? "1 BTC hoy: " : "1 BTC today: ")+(btcNowFailed ? (es ? "no disponible" : "unavailable") : "…");
   }
