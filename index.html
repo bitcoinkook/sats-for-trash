@@ -211,6 +211,16 @@ html, body {
   gap: 12px;
   margin: 24px 0;
 }
+/* BTC/USD value line under the To Date boxes */
+.kook-trash .kook-btc-value {
+  font-family: var(--font-sans);
+  font-size: var(--text-meta);
+  color: #666;
+  text-align: center;
+  line-height: 1.8;
+  margin: -8px 0 24px 0;
+}
+.kook-trash .kook-btc-value b { color: #222; }
 .kook-trash .kook-podium {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -1022,11 +1032,12 @@ html, body {
         <span class="kook-stat-sublabel" data-lang-en="">(2.5 gal/10 L)</span>
       </div>
     </div>
+    <p class="kook-btc-value" id="btcValue"></p>
 
     <h2 data-lang-es="">⚡ Top Zappers</h2>
     <h2 data-lang-en="">⚡ Top Zappers</h2>
-    <p data-lang-es="">Las personas que apoyan el proyecto económicamente. Los sats ⚡ son lo que envían; los puntos ⭐ suben cuanto más a menudo zapean.</p>
-    <p data-lang-en="">The people supporting the project economically. Sats ⚡ are what they send; points ⭐ climb the more often they zap.</p>
+    <p data-lang-es="">Los usuarios de Nostr que más apoyan el proyecto con bitcoin, tanto quienes envían más sats como quienes zapean más a menudo.</p>
+    <p data-lang-en="">The users on Nostr backing the project the most with bitcoin, both those who send the most sats and those who zap most often.</p>
     <div class="kook-duo">
       <div>
         <div class="kook-duo-title" data-lang-es="">⚡ Más sats</div>
@@ -1131,6 +1142,13 @@ html, body {
       <span class="kook-section-label" data-lang-en="">⚡ Combined score · Sats + Loyalty</span>
       <p data-lang-es="" class="kook-section-desc">Sats enviados, más un bonus de fidelidad (factor 0,21) que crece con cada salida distinta zapeada.</p>
       <p data-lang-en="" class="kook-section-desc">Sats sent, plus a loyalty bonus (factor 0.21) that grows with each distinct outing zapped.</p>
+      <div class="kook-controls">
+        <label class="kook-control">
+          <span class="kook-control-label" data-lang-es="">Orden</span>
+          <span class="kook-control-label" data-lang-en="">Sort</span>
+          <select id="rankSortSelect" onchange="onRankSortChange()"></select>
+        </label>
+      </div>
       <ol id="rankingList"></ol>
     </div>
     <div class="kook-pagination" id="paginationRankingSats"></div>
@@ -1175,8 +1193,8 @@ html, body {
     <div id="extraSection" style="display:none;">
     <h2 data-lang-es="">📝 Registro de Notas de Otras Cosas</h2>
     <h2 data-lang-en="">📝 Other Stuff Notes Log</h2>
-    <p data-lang-es="">Notas de satsfortrash que no son salidas (pensamientos, comentarios) y han recibido zaps. Sus sats cuentan en los totales del proyecto.</p>
-    <p data-lang-en="">Satsfortrash notes that aren't outings (thoughts, comments) and received zaps. Their sats count toward the project totals.</p>
+    <p data-lang-es="">Notas de satsfortrash que no son salidas, como pensamientos o comentarios, y han recibido zaps. Sus sats cuentan en los totales del proyecto.</p>
+    <p data-lang-en="">Satsfortrash notes that aren't outings, like thoughts or comments, and received zaps. Their sats count toward the project totals.</p>
     <div class="kook-table-wrap" id="extraLogAnchor">
       <table class="kook-data">
         <thead><tr>
@@ -1628,6 +1646,52 @@ async function fetchCsv(url, label) {
   return parseCSV(text);
 }
 
+// ── BTC/USD value of the sats collected ──
+// Fixed reference: BTC/USD at 00:00 UTC on 1 May 2026, the project start.
+const BTC_USD_START = 76346;
+let BTC_USD_NOW = null;          // filled by loadBtcPrice()
+let btcNowFailed = false;
+let TOTAL_SATS_ALL = null;       // set in render()
+function fmtUsd(v, lang) {
+  const l = lang || currentLang || "en";
+  const big = v >= 1000;
+  return v.toLocaleString(l==="en" ? "en-US" : "es-ES",
+    { style:"currency", currency:"USD", minimumFractionDigits: big?0:2, maximumFractionDigits: big?0:2 });
+}
+function renderBtcValue(lang) {
+  const el = document.getElementById("btcValue");
+  if (!el || TOTAL_SATS_ALL === null) return;
+  const btc = TOTAL_SATS_ALL / 1e8;
+  const es = lang === "es";
+  const line1 = (es ? "1 BTC el 01/05/2026: " : "1 BTC on May 1, 2026: ")+"<b>"+fmtUsd(BTC_USD_START,lang)+"</b> · "+
+                (es ? "valor de los sats: " : "sats value: ")+"<b>"+fmtUsd(btc*BTC_USD_START,lang)+"</b>";
+  let line2;
+  if (BTC_USD_NOW) {
+    line2 = (es ? "1 BTC hoy: " : "1 BTC today: ")+"<b>"+fmtUsd(BTC_USD_NOW,lang)+"</b> · "+
+            (es ? "valor de los sats: " : "sats value: ")+"<b>"+fmtUsd(btc*BTC_USD_NOW,lang)+"</b>";
+  } else {
+    line2 = (es ? "1 BTC hoy: " : "1 BTC today: ")+(btcNowFailed ? (es ? "no disponible" : "unavailable") : "…");
+  }
+  el.innerHTML = line1+"<br>"+line2;
+}
+// Live price: mempool.space first, CoinGecko as fallback. No API keys needed.
+async function loadBtcPrice() {
+  const sources = [
+    ["https://mempool.space/api/v1/prices", j => j && j.USD],
+    ["https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd", j => j && j.bitcoin && j.bitcoin.usd]
+  ];
+  for (const [url, pick] of sources) {
+    try {
+      const r = await fetch(url, { cache: "no-store" });
+      if (!r.ok) continue;
+      const v = Number(pick(await r.json()));
+      if (v > 0) { BTC_USD_NOW = v; renderBtcValue(currentLang); return; }
+    } catch (e) {}
+  }
+  btcNowFailed = true;
+  renderBtcValue(currentLang);
+}
+
 async function loadData() {
   const lang = getLang();
   document.getElementById("warningBox").style.display = "none";
@@ -2075,13 +2139,33 @@ function renderMiniPodium(id, entries, mainFn, midFn, subFn) {
       '<div class="kook-podium-name">'+zapperLink(e.npub)+'</div>'+
       '<div class="kook-podium-sats">'+mainFn(e)+'</div>'+
       '<div class="kook-podium-zaps">'+midFn(e)+'</div>'+
-      '<div class="kook-podium-line3">'+subFn(e)+'</div>'+
+      (subFn ? '<div class="kook-podium-line3">'+subFn(e)+'</div>' : '')+
     '</div>';
   }).join("");
 }
 
+// Zapper ranking sort: points (default), sats, zaps. Ties fall back to the other two.
+let activeRankSort = "points";
+function onRankSortChange() {
+  activeRankSort = document.getElementById("rankSortSelect").value;
+  pageRankSats = 0;
+  renderRankings(currentLang);
+}
 function renderRankings(lang, fullRanking) {
-  const combinado=fullRanking || computeRanking();
+  const sortSel=document.getElementById("rankSortSelect");
+  if (sortSel) {
+    const opts = lang==="es"
+      ? [["points","Más puntos"],["sats","Más sats"],["zaps","Más zaps"]]
+      : [["points","Most points"],["sats","Most sats"],["zaps","Most zaps"]];
+    sortSel.innerHTML = opts.map(([v,l]) =>
+      '<option value="'+v+'"'+(activeRankSort===v?' selected':'')+'>'+l+'</option>').join("");
+  }
+  const rankSorters = {
+    points: (a,b) => b.puntos-a.puntos || b.sats-a.sats || b.nZaps-a.nZaps,
+    sats:   (a,b) => b.sats-a.sats || b.nZaps-a.nZaps || b.puntos-a.puntos,
+    zaps:   (a,b) => b.nZaps-a.nZaps || b.sats-a.sats || b.puntos-a.puntos
+  };
+  const combinado=(fullRanking || computeRanking()).slice().sort(rankSorters[activeRankSort] || rankSorters.points);
   document.getElementById("rankingList").innerHTML=
     combinado.slice(pageRankSats*PAGE_SIZE,(pageRankSats+1)*PAGE_SIZE)
       .map((e,i)=>{
@@ -2118,6 +2202,8 @@ function render(lang) {
   const totalZapsAll=NOTES.concat(EXTRA_NOTES).reduce((s,n)=>s+n.zaps.length,0);
   const fullRanking=computeRanking();
   const zappersUnicos=fullRanking.length;
+  TOTAL_SATS_ALL=totalSatsAll;
+  renderBtcValue(lang);
 
   document.getElementById("statOutings").innerHTML=NOTES.length+'<span class="kook-stat-emoji">🌅</span>';
   document.getElementById("statLiters").innerHTML=fmtBolsasNum(totalBags)+'<span class="kook-stat-emoji">💰</span>';
@@ -2134,12 +2220,10 @@ function render(lang) {
   const byZaps = fullRanking.slice().sort(function(a,b){ return b.nZaps-a.nZaps || b.sats-a.sats; });
   renderMiniPodium("podiumSats", bySats,
     function(e){ return fmtNum(e.sats)+' \u26A1'; },
-    function(e){ return fmtNum(e.puntos)+' \u2B50'; },
     function(e){ return e.nZaps+' '+(e.nZaps===1?zapUnit:zapsUnit); });
   renderMiniPodium("podiumZaps", byZaps,
     function(e){ return e.nZaps+' '+(e.nZaps===1?zapUnit:zapsUnit); },
-    function(e){ return fmtNum(e.sats)+' \u26A1'; },
-    function(e){ return fmtNum(e.puntos)+' \u2B50'; });
+    function(e){ return fmtNum(e.sats)+' \u26A1'; });
 
   const strike=calcStrike(NOTES);
   const potential=calcStrikePotential(NOTES,strike.max);
@@ -2326,6 +2410,7 @@ function toggleNormie(lang) {
 
 
 loadData();
+loadBtcPrice();
 </script>
 
 <div class="kook-lightbox" id="kookLightbox" aria-hidden="true" onclick="lightboxBgClick(event)">
